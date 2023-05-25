@@ -2,6 +2,7 @@ package main
 
 import (
 	"GoSoft/graph"
+	"context"
 	"github.com/gin-gonic/gin"
 	"os"
 
@@ -17,8 +18,17 @@ func graphqlHandler() gin.HandlerFunc {
 	// Resolver is in the resolver.go file
 	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
-	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+	return func(ctx *gin.Context) {
+		ctx.Cookie("GoSoftToken")
+
+		// Allow unauthenticated users in
+		//if err != nil {
+		//	h.ServeHTTP(ctx.Writer, ctx.Request)
+		//	return
+		//}
+		cont := context.WithValue(ctx.Request.Context(), "GoSoftToken", "t")
+		ctx.Request = ctx.Request.WithContext(cont)
+		h.ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
 

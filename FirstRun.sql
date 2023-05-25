@@ -28,6 +28,12 @@ CREATE TABLE IF NOT EXISTS Store (
                                      Price REAL NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS CART (
+                                    UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
+                                    ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
+                                    Count INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS Categories (
                                           ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
                                           Category TEXT NOT NULL

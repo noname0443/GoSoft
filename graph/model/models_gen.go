@@ -33,10 +33,6 @@ type Product struct {
 	Price       float64 `json:"price"`
 }
 
-type Token struct {
-	Token string `json:"token"`
-}
-
 type User struct {
 	ID      string `json:"id"`
 	Email   string `json:"email"`

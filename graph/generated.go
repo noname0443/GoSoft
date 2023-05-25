@@ -62,24 +62,24 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		CartAdd       func(childComplexity int, authToken model.Token, productid int) int
-		CartInspect   func(childComplexity int, authToken model.Token, cartid int) int
-		CartPurchase  func(childComplexity int, authToken model.Token) int
-		CartRemove    func(childComplexity int, authToken model.Token, cartid int) int
-		CommentAdd    func(childComplexity int, authToken model.Token, content string, productid int) int
-		CommentRemove func(childComplexity int, authToken model.Token, commentid int) int
-		CommentUpdate func(childComplexity int, authToken model.Token, commentid int) int
-		Comments      func(childComplexity int, productid int, from *int, to *int) int
-		History       func(childComplexity int, authToken model.Token) int
+		CartAdd       func(childComplexity int, productid int) int
+		CartInspect   func(childComplexity int, cartid int) int
+		CartPurchase  func(childComplexity int) int
+		CartRemove    func(childComplexity int, cartid int) int
+		CommentAdd    func(childComplexity int, content string, productid int) int
+		CommentRemove func(childComplexity int, commentid int) int
+		CommentUpdate func(childComplexity int, commentid int) int
+		Comments      func(childComplexity int, productid int, from *int, count *int) int
+		History       func(childComplexity int) int
 		Login         func(childComplexity int, email string, password string) int
 		Product       func(childComplexity int, id int) int
-		ProfileGet    func(childComplexity int, authToken model.Token) int
-		ProfileUpdate func(childComplexity int, authToken model.Token, email *string, name *string, surname *string, gender *string, password *string) int
+		ProfileGet    func(childComplexity int) int
+		ProfileUpdate func(childComplexity int, email *string, name *string, surname *string, gender *string, password *string) int
 		Register      func(childComplexity int, email string, name string, surname string, gender string, password string) int
 		Search        func(childComplexity int, name *string, categories *string, lowerPrice *float64, highestPrice *float64) int
-		StoreAdd      func(childComplexity int, authToken model.Token, product model.NewProduct) int
-		StoreRemove   func(childComplexity int, authToken model.Token, productid int) int
-		StoreUpdate   func(childComplexity int, authToken model.Token, productid int, product model.NewProduct) int
+		StoreAdd      func(childComplexity int, product model.NewProduct) int
+		StoreRemove   func(childComplexity int, productid int) int
+		StoreUpdate   func(childComplexity int, productid int, product model.NewProduct) int
 	}
 
 	User struct {
@@ -96,22 +96,22 @@ type ComplexityRoot struct {
 type QueryResolver interface {
 	Search(ctx context.Context, name *string, categories *string, lowerPrice *float64, highestPrice *float64) ([]*model.Product, error)
 	Product(ctx context.Context, id int) (*model.Product, error)
-	Comments(ctx context.Context, productid int, from *int, to *int) ([]*model.Comment, error)
+	Comments(ctx context.Context, productid int, from *int, count *int) ([]*model.Comment, error)
 	Register(ctx context.Context, email string, name string, surname string, gender string, password string) (string, error)
 	Login(ctx context.Context, email string, password string) (string, error)
-	CartAdd(ctx context.Context, authToken model.Token, productid int) (*bool, error)
-	CartRemove(ctx context.Context, authToken model.Token, cartid int) (*bool, error)
-	CartInspect(ctx context.Context, authToken model.Token, cartid int) (*model.Product, error)
-	CartPurchase(ctx context.Context, authToken model.Token) (*bool, error)
-	ProfileGet(ctx context.Context, authToken model.Token) (*model.User, error)
-	ProfileUpdate(ctx context.Context, authToken model.Token, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error)
-	History(ctx context.Context, authToken model.Token) ([]*model.Product, error)
-	CommentAdd(ctx context.Context, authToken model.Token, content string, productid int) (*bool, error)
-	CommentRemove(ctx context.Context, authToken model.Token, commentid int) (*bool, error)
-	CommentUpdate(ctx context.Context, authToken model.Token, commentid int) (*bool, error)
-	StoreAdd(ctx context.Context, authToken model.Token, product model.NewProduct) (*bool, error)
-	StoreRemove(ctx context.Context, authToken model.Token, productid int) (*bool, error)
-	StoreUpdate(ctx context.Context, authToken model.Token, productid int, product model.NewProduct) (*bool, error)
+	CartAdd(ctx context.Context, productid int) (*bool, error)
+	CartRemove(ctx context.Context, cartid int) (*bool, error)
+	CartInspect(ctx context.Context, cartid int) (*model.Product, error)
+	CartPurchase(ctx context.Context) (*bool, error)
+	ProfileGet(ctx context.Context) (*model.User, error)
+	ProfileUpdate(ctx context.Context, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error)
+	History(ctx context.Context) ([]*model.Product, error)
+	CommentAdd(ctx context.Context, content string, productid int) (*bool, error)
+	CommentRemove(ctx context.Context, commentid int) (*bool, error)
+	CommentUpdate(ctx context.Context, commentid int) (*bool, error)
+	StoreAdd(ctx context.Context, product model.NewProduct) (*bool, error)
+	StoreRemove(ctx context.Context, productid int) (*bool, error)
+	StoreUpdate(ctx context.Context, productid int, product model.NewProduct) (*bool, error)
 }
 
 type executableSchema struct {
@@ -216,7 +216,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CartAdd(childComplexity, args["authToken"].(model.Token), args["productid"].(int)), true
+		return e.complexity.Query.CartAdd(childComplexity, args["productid"].(int)), true
 
 	case "Query.CartInspect":
 		if e.complexity.Query.CartInspect == nil {
@@ -228,19 +228,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CartInspect(childComplexity, args["authToken"].(model.Token), args["cartid"].(int)), true
+		return e.complexity.Query.CartInspect(childComplexity, args["cartid"].(int)), true
 
 	case "Query.CartPurchase":
 		if e.complexity.Query.CartPurchase == nil {
 			break
 		}
 
-		args, err := ec.field_Query_CartPurchase_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.CartPurchase(childComplexity, args["authToken"].(model.Token)), true
+		return e.complexity.Query.CartPurchase(childComplexity), true
 
 	case "Query.CartRemove":
 		if e.complexity.Query.CartRemove == nil {
@@ -252,7 +247,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CartRemove(childComplexity, args["authToken"].(model.Token), args["cartid"].(int)), true
+		return e.complexity.Query.CartRemove(childComplexity, args["cartid"].(int)), true
 
 	case "Query.CommentAdd":
 		if e.complexity.Query.CommentAdd == nil {
@@ -264,7 +259,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CommentAdd(childComplexity, args["authToken"].(model.Token), args["content"].(string), args["productid"].(int)), true
+		return e.complexity.Query.CommentAdd(childComplexity, args["content"].(string), args["productid"].(int)), true
 
 	case "Query.CommentRemove":
 		if e.complexity.Query.CommentRemove == nil {
@@ -276,7 +271,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CommentRemove(childComplexity, args["authToken"].(model.Token), args["commentid"].(int)), true
+		return e.complexity.Query.CommentRemove(childComplexity, args["commentid"].(int)), true
 
 	case "Query.CommentUpdate":
 		if e.complexity.Query.CommentUpdate == nil {
@@ -288,7 +283,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.CommentUpdate(childComplexity, args["authToken"].(model.Token), args["commentid"].(int)), true
+		return e.complexity.Query.CommentUpdate(childComplexity, args["commentid"].(int)), true
 
 	case "Query.comments":
 		if e.complexity.Query.Comments == nil {
@@ -300,19 +295,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Comments(childComplexity, args["productid"].(int), args["from"].(*int), args["to"].(*int)), true
+		return e.complexity.Query.Comments(childComplexity, args["productid"].(int), args["from"].(*int), args["count"].(*int)), true
 
 	case "Query.History":
 		if e.complexity.Query.History == nil {
 			break
 		}
 
-		args, err := ec.field_Query_History_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.History(childComplexity, args["authToken"].(model.Token)), true
+		return e.complexity.Query.History(childComplexity), true
 
 	case "Query.login":
 		if e.complexity.Query.Login == nil {
@@ -343,12 +333,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_ProfileGet_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.ProfileGet(childComplexity, args["authToken"].(model.Token)), true
+		return e.complexity.Query.ProfileGet(childComplexity), true
 
 	case "Query.ProfileUpdate":
 		if e.complexity.Query.ProfileUpdate == nil {
@@ -360,7 +345,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.ProfileUpdate(childComplexity, args["authToken"].(model.Token), args["email"].(*string), args["name"].(*string), args["surname"].(*string), args["gender"].(*string), args["password"].(*string)), true
+		return e.complexity.Query.ProfileUpdate(childComplexity, args["email"].(*string), args["name"].(*string), args["surname"].(*string), args["gender"].(*string), args["password"].(*string)), true
 
 	case "Query.register":
 		if e.complexity.Query.Register == nil {
@@ -396,7 +381,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.StoreAdd(childComplexity, args["authToken"].(model.Token), args["product"].(model.NewProduct)), true
+		return e.complexity.Query.StoreAdd(childComplexity, args["product"].(model.NewProduct)), true
 
 	case "Query.StoreRemove":
 		if e.complexity.Query.StoreRemove == nil {
@@ -408,7 +393,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.StoreRemove(childComplexity, args["authToken"].(model.Token), args["productid"].(int)), true
+		return e.complexity.Query.StoreRemove(childComplexity, args["productid"].(int)), true
 
 	case "Query.StoreUpdate":
 		if e.complexity.Query.StoreUpdate == nil {
@@ -420,7 +405,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.StoreUpdate(childComplexity, args["authToken"].(model.Token), args["productid"].(int), args["product"].(model.NewProduct)), true
+		return e.complexity.Query.StoreUpdate(childComplexity, args["productid"].(int), args["product"].(model.NewProduct)), true
 
 	case "User.date":
 		if e.complexity.User.Date == nil {
@@ -480,7 +465,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewProduct,
-		ec.unmarshalInputToken,
 	)
 	first := true
 
@@ -548,15 +532,60 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Query_CartAdd_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
+	var arg0 int
+	if tmp, ok := rawArgs["productid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["authToken"] = arg0
+	args["productid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_CartInspect_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["cartid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cartid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["cartid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_CartRemove_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["cartid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cartid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["cartid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_CommentAdd_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["content"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["content"] = arg0
 	var arg1 int
 	if tmp, ok := rawArgs["productid"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
@@ -569,252 +598,129 @@ func (ec *executionContext) field_Query_CartAdd_args(ctx context.Context, rawArg
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_CartInspect_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["cartid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cartid"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["cartid"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_CartPurchase_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_CartRemove_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["cartid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cartid"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["cartid"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_CommentAdd_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["content"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("content"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["content"] = arg1
-	var arg2 int
-	if tmp, ok := rawArgs["productid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
-		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["productid"] = arg2
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_CommentRemove_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 int
+	var arg0 int
 	if tmp, ok := rawArgs["commentid"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentid"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["commentid"] = arg1
+	args["commentid"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_CommentUpdate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 int
+	var arg0 int
 	if tmp, ok := rawArgs["commentid"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentid"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["commentid"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_History_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_ProfileGet_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
+	args["commentid"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_ProfileUpdate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["authToken"] = arg0
+	args["email"] = arg0
 	var arg1 *string
-	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["email"] = arg1
+	args["name"] = arg1
 	var arg2 *string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["surname"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("surname"))
 		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg2
+	args["surname"] = arg2
 	var arg3 *string
-	if tmp, ok := rawArgs["surname"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("surname"))
+	if tmp, ok := rawArgs["gender"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
 		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["surname"] = arg3
+	args["gender"] = arg3
 	var arg4 *string
-	if tmp, ok := rawArgs["gender"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
+	if tmp, ok := rawArgs["password"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 		arg4, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["gender"] = arg4
-	var arg5 *string
-	if tmp, ok := rawArgs["password"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
-		arg5, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["password"] = arg5
+	args["password"] = arg4
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_StoreAdd_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
+	var arg0 model.NewProduct
+	if tmp, ok := rawArgs["product"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product"))
+		arg0, err = ec.unmarshalNNewProduct2GoSoftᚋgraphᚋmodelᚐNewProduct(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["authToken"] = arg0
+	args["product"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_StoreRemove_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["productid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["productid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_StoreUpdate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["productid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["productid"] = arg0
 	var arg1 model.NewProduct
 	if tmp, ok := rawArgs["product"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product"))
@@ -824,63 +730,6 @@ func (ec *executionContext) field_Query_StoreAdd_args(ctx context.Context, rawAr
 		}
 	}
 	args["product"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_StoreRemove_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["productid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["productid"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_StoreUpdate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.Token
-	if tmp, ok := rawArgs["authToken"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authToken"))
-		arg0, err = ec.unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authToken"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["productid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productid"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["productid"] = arg1
-	var arg2 model.NewProduct
-	if tmp, ok := rawArgs["product"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("product"))
-		arg2, err = ec.unmarshalNNewProduct2GoSoftᚋgraphᚋmodelᚐNewProduct(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["product"] = arg2
 	return args, nil
 }
 
@@ -921,14 +770,14 @@ func (ec *executionContext) field_Query_comments_args(ctx context.Context, rawAr
 	}
 	args["from"] = arg1
 	var arg2 *int
-	if tmp, ok := rawArgs["to"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+	if tmp, ok := rawArgs["count"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
 		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["to"] = arg2
+	args["count"] = arg2
 	return args, nil
 }
 
@@ -1738,7 +1587,7 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comments(rctx, fc.Args["productid"].(int), fc.Args["from"].(*int), fc.Args["to"].(*int))
+		return ec.resolvers.Query().Comments(rctx, fc.Args["productid"].(int), fc.Args["from"].(*int), fc.Args["count"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1915,7 +1764,7 @@ func (ec *executionContext) _Query_CartAdd(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CartAdd(rctx, fc.Args["authToken"].(model.Token), fc.Args["productid"].(int))
+		return ec.resolvers.Query().CartAdd(rctx, fc.Args["productid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1967,7 +1816,7 @@ func (ec *executionContext) _Query_CartRemove(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CartRemove(rctx, fc.Args["authToken"].(model.Token), fc.Args["cartid"].(int))
+		return ec.resolvers.Query().CartRemove(rctx, fc.Args["cartid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2019,7 +1868,7 @@ func (ec *executionContext) _Query_CartInspect(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CartInspect(rctx, fc.Args["authToken"].(model.Token), fc.Args["cartid"].(int))
+		return ec.resolvers.Query().CartInspect(rctx, fc.Args["cartid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2088,7 +1937,7 @@ func (ec *executionContext) _Query_CartPurchase(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CartPurchase(rctx, fc.Args["authToken"].(model.Token))
+		return ec.resolvers.Query().CartPurchase(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2112,17 +1961,6 @@ func (ec *executionContext) fieldContext_Query_CartPurchase(ctx context.Context,
 			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_CartPurchase_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
 	return fc, nil
 }
 
@@ -2140,7 +1978,7 @@ func (ec *executionContext) _Query_ProfileGet(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ProfileGet(rctx, fc.Args["authToken"].(model.Token))
+		return ec.resolvers.Query().ProfileGet(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2183,17 +2021,6 @@ func (ec *executionContext) fieldContext_Query_ProfileGet(ctx context.Context, f
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_ProfileGet_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
 	return fc, nil
 }
 
@@ -2211,7 +2038,7 @@ func (ec *executionContext) _Query_ProfileUpdate(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ProfileUpdate(rctx, fc.Args["authToken"].(model.Token), fc.Args["email"].(*string), fc.Args["name"].(*string), fc.Args["surname"].(*string), fc.Args["gender"].(*string), fc.Args["password"].(*string))
+		return ec.resolvers.Query().ProfileUpdate(rctx, fc.Args["email"].(*string), fc.Args["name"].(*string), fc.Args["surname"].(*string), fc.Args["gender"].(*string), fc.Args["password"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2282,7 +2109,7 @@ func (ec *executionContext) _Query_History(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().History(rctx, fc.Args["authToken"].(model.Token))
+		return ec.resolvers.Query().History(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2320,17 +2147,6 @@ func (ec *executionContext) fieldContext_Query_History(ctx context.Context, fiel
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
 	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_History_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
 	return fc, nil
 }
 
@@ -2348,7 +2164,7 @@ func (ec *executionContext) _Query_CommentAdd(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CommentAdd(rctx, fc.Args["authToken"].(model.Token), fc.Args["content"].(string), fc.Args["productid"].(int))
+		return ec.resolvers.Query().CommentAdd(rctx, fc.Args["content"].(string), fc.Args["productid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2400,7 +2216,7 @@ func (ec *executionContext) _Query_CommentRemove(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CommentRemove(rctx, fc.Args["authToken"].(model.Token), fc.Args["commentid"].(int))
+		return ec.resolvers.Query().CommentRemove(rctx, fc.Args["commentid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2452,7 +2268,7 @@ func (ec *executionContext) _Query_CommentUpdate(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().CommentUpdate(rctx, fc.Args["authToken"].(model.Token), fc.Args["commentid"].(int))
+		return ec.resolvers.Query().CommentUpdate(rctx, fc.Args["commentid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2504,7 +2320,7 @@ func (ec *executionContext) _Query_StoreAdd(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().StoreAdd(rctx, fc.Args["authToken"].(model.Token), fc.Args["product"].(model.NewProduct))
+		return ec.resolvers.Query().StoreAdd(rctx, fc.Args["product"].(model.NewProduct))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2556,7 +2372,7 @@ func (ec *executionContext) _Query_StoreRemove(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().StoreRemove(rctx, fc.Args["authToken"].(model.Token), fc.Args["productid"].(int))
+		return ec.resolvers.Query().StoreRemove(rctx, fc.Args["productid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2608,7 +2424,7 @@ func (ec *executionContext) _Query_StoreUpdate(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().StoreUpdate(rctx, fc.Args["authToken"].(model.Token), fc.Args["productid"].(int), fc.Args["product"].(model.NewProduct))
+		return ec.resolvers.Query().StoreUpdate(rctx, fc.Args["productid"].(int), fc.Args["product"].(model.NewProduct))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4921,35 +4737,6 @@ func (ec *executionContext) unmarshalInputNewProduct(ctx context.Context, obj in
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputToken(ctx context.Context, obj interface{}) (model.Token, error) {
-	var it model.Token
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"token"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "token":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Token = data
-		}
-	}
-
-	return it, nil
-}
-
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -6091,11 +5878,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNToken2GoSoftᚋgraphᚋmodelᚐToken(ctx context.Context, v interface{}) (model.Token, error) {
-	res, err := ec.unmarshalInputToken(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUser2GoSoftᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {

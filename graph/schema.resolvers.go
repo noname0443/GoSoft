@@ -72,7 +72,7 @@ func (r *queryResolver) Comments(ctx context.Context, productid int, from *int, 
 		preparedFrom = 0
 	}
 
-	if count != nil && *count > preparedFrom && *count <= preparedFrom - 10 {
+	if count != nil && *count > preparedFrom && *count <= preparedFrom-10 {
 		preparedCount = *count
 	} else {
 		preparedCount = 5
@@ -104,67 +104,67 @@ func (r *queryResolver) Login(ctx context.Context, email string, password string
 }
 
 // CartAdd is the resolver for the CartAdd field.
-func (r *queryResolver) CartAdd(ctx context.Context, authToken model.Token, productid int) (*bool, error) {
+func (r *queryResolver) CartAdd(ctx context.Context, productid int) (*bool, error) {
 	panic(fmt.Errorf("not implemented: CartAdd - CartAdd"))
 }
 
 // CartRemove is the resolver for the CartRemove field.
-func (r *queryResolver) CartRemove(ctx context.Context, authToken model.Token, cartid int) (*bool, error) {
+func (r *queryResolver) CartRemove(ctx context.Context, cartid int) (*bool, error) {
 	panic(fmt.Errorf("not implemented: CartRemove - CartRemove"))
 }
 
 // CartInspect is the resolver for the CartInspect field.
-func (r *queryResolver) CartInspect(ctx context.Context, authToken model.Token, cartid int) (*model.Product, error) {
+func (r *queryResolver) CartInspect(ctx context.Context, cartid int) (*model.Product, error) {
 	panic(fmt.Errorf("not implemented: CartInspect - CartInspect"))
 }
 
 // CartPurchase is the resolver for the CartPurchase field.
-func (r *queryResolver) CartPurchase(ctx context.Context, authToken model.Token) (*bool, error) {
+func (r *queryResolver) CartPurchase(ctx context.Context) (*bool, error) {
 	panic(fmt.Errorf("not implemented: CartPurchase - CartPurchase"))
 }
 
 // ProfileGet is the resolver for the ProfileGet field.
-func (r *queryResolver) ProfileGet(ctx context.Context, authToken model.Token) (*model.User, error) {
+func (r *queryResolver) ProfileGet(ctx context.Context) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: ProfileGet - ProfileGet"))
 }
 
 // ProfileUpdate is the resolver for the ProfileUpdate field.
-func (r *queryResolver) ProfileUpdate(ctx context.Context, authToken model.Token, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error) {
+func (r *queryResolver) ProfileUpdate(ctx context.Context, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: ProfileUpdate - ProfileUpdate"))
 }
 
 // History is the resolver for the History field.
-func (r *queryResolver) History(ctx context.Context, authToken model.Token) ([]*model.Product, error) {
+func (r *queryResolver) History(ctx context.Context) ([]*model.Product, error) {
 	panic(fmt.Errorf("not implemented: History - History"))
 }
 
 // CommentAdd is the resolver for the CommentAdd field.
-func (r *queryResolver) CommentAdd(ctx context.Context, authToken model.Token, content string, productid int) (*bool, error) {
+func (r *queryResolver) CommentAdd(ctx context.Context, content string, productid int) (*bool, error) {
 	panic(fmt.Errorf("not implemented: CommentAdd - CommentAdd"))
 }
 
 // CommentRemove is the resolver for the CommentRemove field.
-func (r *queryResolver) CommentRemove(ctx context.Context, authToken model.Token, commentid int) (*bool, error) {
+func (r *queryResolver) CommentRemove(ctx context.Context, commentid int) (*bool, error) {
 	panic(fmt.Errorf("not implemented: CommentRemove - CommentRemove"))
 }
 
 // CommentUpdate is the resolver for the CommentUpdate field.
-func (r *queryResolver) CommentUpdate(ctx context.Context, authToken model.Token, commentid int) (*bool, error) {
+func (r *queryResolver) CommentUpdate(ctx context.Context, commentid int) (*bool, error) {
 	panic(fmt.Errorf("not implemented: CommentUpdate - CommentUpdate"))
 }
 
 // StoreAdd is the resolver for the StoreAdd field.
-func (r *queryResolver) StoreAdd(ctx context.Context, authToken model.Token, product model.NewProduct) (*bool, error) {
+func (r *queryResolver) StoreAdd(ctx context.Context, product model.NewProduct) (*bool, error) {
 	panic(fmt.Errorf("not implemented: StoreAdd - StoreAdd"))
 }
 
 // StoreRemove is the resolver for the StoreRemove field.
-func (r *queryResolver) StoreRemove(ctx context.Context, authToken model.Token, productid int) (*bool, error) {
+func (r *queryResolver) StoreRemove(ctx context.Context, productid int) (*bool, error) {
 	panic(fmt.Errorf("not implemented: StoreRemove - StoreRemove"))
 }
 
 // StoreUpdate is the resolver for the StoreUpdate field.
-func (r *queryResolver) StoreUpdate(ctx context.Context, authToken model.Token, productid int, product model.NewProduct) (*bool, error) {
+func (r *queryResolver) StoreUpdate(ctx context.Context, productid int, product model.NewProduct) (*bool, error) {
 	panic(fmt.Errorf("not implemented: StoreUpdate - StoreUpdate"))
 }
 

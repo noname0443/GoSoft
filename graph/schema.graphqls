@@ -30,10 +30,6 @@ type Comment {
     content: String!
 }
 
-input Token {
-    token: String!
-}
-
 input NewProduct {
     name: String!
     description: String!
@@ -50,21 +46,21 @@ type Query {
     register(email: String!, name: String!, surname: String!, gender: String!, password: String!): String!
     login(email: String!, password: String!): String!
 
-    CartAdd(authToken: Token!, productid: Int!): Boolean
-    CartRemove(authToken: Token!, cartid: Int!): Boolean
-    CartInspect(authToken: Token!, cartid: Int!): Product!
-    CartPurchase(authToken: Token!): Boolean
+    CartAdd(productid: Int!): Boolean
+    CartRemove(cartid: Int!): Boolean
+    CartInspect(cartid: Int!): Product!
+    CartPurchase: Boolean
 
-    ProfileGet(authToken: Token!): User!
-    ProfileUpdate(authToken: Token!, email: String, name: String, surname: String, gender: String, password: String): User!
+    ProfileGet: User!
+    ProfileUpdate(email: String, name: String, surname: String, gender: String, password: String): User!
 
-    History(authToken: Token!): [Product!]
+    History: [Product!]
 
-    CommentAdd(authToken: Token!, content: String!, productid: Int!): Boolean
-    CommentRemove(authToken: Token!, commentid: Int!): Boolean
-    CommentUpdate(authToken: Token!, commentid: Int!): Boolean
+    CommentAdd(content: String!, productid: Int!): Boolean
+    CommentRemove(commentid: Int!): Boolean
+    CommentUpdate(commentid: Int!): Boolean
 
-    StoreAdd(authToken: Token!, product: NewProduct!): Boolean
-    StoreRemove(authToken: Token!, productid: Int!): Boolean
-    StoreUpdate(authToken: Token!, productid: Int!, product: NewProduct!): Boolean
+    StoreAdd(product: NewProduct!): Boolean
+    StoreRemove(productid: Int!): Boolean
+    StoreUpdate(productid: Int!, product: NewProduct!): Boolean
 }

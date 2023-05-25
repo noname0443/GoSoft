@@ -40,7 +40,7 @@ func RegisterCustomer(email string, name string, surname string, gender string, 
 	checkConnection()
 	token := GenerateToken(password)
 	_, err := PostgreSQL.Query(`INSERT INTO users(email, name, surname, password, gender, token, tokendate, registrationdate, role) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);`, email, name, surname, gender, token, time.Now(), time.Now(), "customer")
-	if err != nil{
+	if err != nil {
 		return "", err
 	}
 	return token, nil
@@ -48,9 +48,18 @@ func RegisterCustomer(email string, name string, surname string, gender string, 
 
 func LoginCustomer(email string, password string) (string, error) {
 	checkConnection()
+
+	rows, err := PostgreSQL.Query(`SELECT * FROM users WHERE email = $1 AND password = $2`, email, password)
+	if err != nil {
+		return "", nil
+	}
+	if !rows.Next() {
+		return "", nil
+	}
+
 	token := GenerateToken(password)
-	_, err := PostgreSQL.Query(`UPDATE users SET token = $1 WHERE email = $2 AND password = $3`, token, email, SHA1(password))
-	if err != nil{
+	_, err = PostgreSQL.Query(`UPDATE users SET token = $1 WHERE email = $2 AND password = $3`, token, email, SHA1(password))
+	if err != nil {
 		return "", err
 	}
 	return token, nil
