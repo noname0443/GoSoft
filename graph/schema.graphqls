@@ -1,0 +1,70 @@
+enum Roles {
+    Customer
+    Administrator
+}
+
+type User {
+    id: ID!
+    email: String!
+    name: String!
+    surname: String!
+    gender: String!
+    date: String!
+    Role: Roles!
+}
+
+type Product {
+    id: ID!
+    name: String!
+    description: String!
+    photo: String!
+    file: String!
+    price: Float!
+}
+
+type Comment {
+    id: ID!
+    userid: ID!
+    date: String!
+    productid: ID!
+    content: String!
+}
+
+input Token {
+    token: String!
+}
+
+input NewProduct {
+    name: String!
+    description: String!
+    photo: String!
+    file: String!
+    price: Float!
+}
+
+type Query {
+    search(name: String, categories: String, lower_price: Float, highest_price: Float): [Product!]!
+    product(id: Int!): Product!
+    comments(productid: Int!, from: Int, count: Int): [Comment!]!
+
+    register(email: String!, name: String!, surname: String!, gender: String!, password: String!): String!
+    login(email: String!, password: String!): String!
+
+    CartAdd(authToken: Token!, productid: Int!): Boolean
+    CartRemove(authToken: Token!, cartid: Int!): Boolean
+    CartInspect(authToken: Token!, cartid: Int!): Product!
+    CartPurchase(authToken: Token!): Boolean
+
+    ProfileGet(authToken: Token!): User!
+    ProfileUpdate(authToken: Token!, email: String, name: String, surname: String, gender: String, password: String): User!
+
+    History(authToken: Token!): [Product!]
+
+    CommentAdd(authToken: Token!, content: String!, productid: Int!): Boolean
+    CommentRemove(authToken: Token!, commentid: Int!): Boolean
+    CommentUpdate(authToken: Token!, commentid: Int!): Boolean
+
+    StoreAdd(authToken: Token!, product: NewProduct!): Boolean
+    StoreRemove(authToken: Token!, productid: Int!): Boolean
+    StoreUpdate(authToken: Token!, productid: Int!, product: NewProduct!): Boolean
+}
