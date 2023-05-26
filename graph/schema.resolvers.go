@@ -6,6 +6,7 @@ package graph
 
 import (
 	"GoSoft/DBMS"
+	"GoSoft/Utility"
 	"GoSoft/graph/model"
 	"context"
 	"fmt"
@@ -86,30 +87,40 @@ func (r *queryResolver) Comments(ctx context.Context, productid int, from *int, 
 }
 
 // Register is the resolver for the register field.
-func (r *queryResolver) Register(ctx context.Context, email string, name string, surname string, gender string, password string) (string, error) {
-	token, err := DBMS.RegisterCustomer(email, name, surname, gender, password)
+func (r *queryResolver) Register(ctx context.Context, email string, name string, surname string, gender string, password string) (bool, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
 	if err != nil {
-		return "", err
+		return false, err
 	}
-	return token, nil
+	token, err := DBMS.RegisterCustomer(email, name, surname, gender, password)
+	if err != nil || len(token) == 0 {
+		return false, err
+	}
+	gc.SetCookie("GoSoftToken", token, 259200, "", "", true, true)
+	return true, nil
 }
 
 // Login is the resolver for the login field.
-func (r *queryResolver) Login(ctx context.Context, email string, password string) (string, error) {
-	token, err := DBMS.LoginCustomer(email, password)
+func (r *queryResolver) Login(ctx context.Context, email string, password string) (bool, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
 	if err != nil {
-		return "", err
+		return false, err
 	}
-	return token, nil
+	token, err := DBMS.LoginCustomer(email, password)
+	if err != nil || len(token) == 0 {
+		return false, err
+	}
+	gc.SetCookie("GoSoftToken", token, 259200, "", "", true, true)
+	return true, nil
 }
 
 // CartAdd is the resolver for the CartAdd field.
-func (r *queryResolver) CartAdd(ctx context.Context, productid int) (*bool, error) {
+func (r *queryResolver) CartAdd(ctx context.Context, productid int) (bool, error) {
 	panic(fmt.Errorf("not implemented: CartAdd - CartAdd"))
 }
 
 // CartRemove is the resolver for the CartRemove field.
-func (r *queryResolver) CartRemove(ctx context.Context, cartid int) (*bool, error) {
+func (r *queryResolver) CartRemove(ctx context.Context, cartid int) (bool, error) {
 	panic(fmt.Errorf("not implemented: CartRemove - CartRemove"))
 }
 
@@ -119,18 +130,85 @@ func (r *queryResolver) CartInspect(ctx context.Context, cartid int) (*model.Pro
 }
 
 // CartPurchase is the resolver for the CartPurchase field.
-func (r *queryResolver) CartPurchase(ctx context.Context) (*bool, error) {
+func (r *queryResolver) CartPurchase(ctx context.Context) (bool, error) {
 	panic(fmt.Errorf("not implemented: CartPurchase - CartPurchase"))
 }
 
 // ProfileGet is the resolver for the ProfileGet field.
 func (r *queryResolver) ProfileGet(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: ProfileGet - ProfileGet"))
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return nil, err
+	}
+	DBMS.ValidateToken(token)
+	profile, err := DBMS.GetProfile(token)
+	if err != nil {
+		return nil, err
+	}
+	return profile, nil
 }
 
 // ProfileUpdate is the resolver for the ProfileUpdate field.
 func (r *queryResolver) ProfileUpdate(ctx context.Context, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: ProfileUpdate - ProfileUpdate"))
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return nil, err
+	}
+
+	var preparedEmail string
+	var preparedName string
+	var preparedSurname string
+	var preparedGender string
+	var preparedPassword string
+
+	if email == nil {
+		preparedEmail = ""
+	} else {
+		preparedEmail = *email
+	}
+
+	if name == nil {
+		preparedName = ""
+	} else {
+		preparedName = *name
+	}
+
+	if surname == nil {
+		preparedSurname = ""
+	} else {
+		preparedSurname = *surname
+	}
+
+	if gender == nil {
+		preparedGender = ""
+	} else {
+		preparedGender = *gender
+	}
+
+	if password == nil {
+		preparedPassword = ""
+	} else {
+		preparedPassword = *password
+	}
+
+	DBMS.ValidateToken(token)
+	err = DBMS.UpdateProfile(token, preparedEmail, preparedName, preparedSurname, preparedGender, preparedPassword)
+	if err != nil {
+		return nil, err
+	}
+	profile, err := DBMS.GetProfile(token)
+	if err != nil {
+		return nil, err
+	}
+	return profile, nil
 }
 
 // History is the resolver for the History field.
@@ -139,32 +217,32 @@ func (r *queryResolver) History(ctx context.Context) ([]*model.Product, error) {
 }
 
 // CommentAdd is the resolver for the CommentAdd field.
-func (r *queryResolver) CommentAdd(ctx context.Context, content string, productid int) (*bool, error) {
+func (r *queryResolver) CommentAdd(ctx context.Context, content string, productid int) (bool, error) {
 	panic(fmt.Errorf("not implemented: CommentAdd - CommentAdd"))
 }
 
 // CommentRemove is the resolver for the CommentRemove field.
-func (r *queryResolver) CommentRemove(ctx context.Context, commentid int) (*bool, error) {
+func (r *queryResolver) CommentRemove(ctx context.Context, commentid int) (bool, error) {
 	panic(fmt.Errorf("not implemented: CommentRemove - CommentRemove"))
 }
 
 // CommentUpdate is the resolver for the CommentUpdate field.
-func (r *queryResolver) CommentUpdate(ctx context.Context, commentid int) (*bool, error) {
+func (r *queryResolver) CommentUpdate(ctx context.Context, commentid int) (bool, error) {
 	panic(fmt.Errorf("not implemented: CommentUpdate - CommentUpdate"))
 }
 
 // StoreAdd is the resolver for the StoreAdd field.
-func (r *queryResolver) StoreAdd(ctx context.Context, product model.NewProduct) (*bool, error) {
+func (r *queryResolver) StoreAdd(ctx context.Context, product model.NewProduct) (bool, error) {
 	panic(fmt.Errorf("not implemented: StoreAdd - StoreAdd"))
 }
 
 // StoreRemove is the resolver for the StoreRemove field.
-func (r *queryResolver) StoreRemove(ctx context.Context, productid int) (*bool, error) {
+func (r *queryResolver) StoreRemove(ctx context.Context, productid int) (bool, error) {
 	panic(fmt.Errorf("not implemented: StoreRemove - StoreRemove"))
 }
 
 // StoreUpdate is the resolver for the StoreUpdate field.
-func (r *queryResolver) StoreUpdate(ctx context.Context, productid int, product model.NewProduct) (*bool, error) {
+func (r *queryResolver) StoreUpdate(ctx context.Context, productid int, product model.NewProduct) (bool, error) {
 	panic(fmt.Errorf("not implemented: StoreUpdate - StoreUpdate"))
 }
 

@@ -10,7 +10,7 @@ type User {
     surname: String!
     gender: String!
     date: String!
-    Role: Roles!
+    role: Roles!
 }
 
 type Product {
@@ -43,24 +43,24 @@ type Query {
     product(id: Int!): Product!
     comments(productid: Int!, from: Int, count: Int): [Comment!]!
 
-    register(email: String!, name: String!, surname: String!, gender: String!, password: String!): String!
-    login(email: String!, password: String!): String!
+    register(email: String!, name: String!, surname: String!, gender: String!, password: String!): Boolean!
+    login(email: String!, password: String!): Boolean!
 
-    CartAdd(productid: Int!): Boolean
-    CartRemove(cartid: Int!): Boolean
+    CartAdd(productid: Int!, count: Int!): Boolean!
+    CartRemove(cartid: Int!, count: Int!): Boolean!
     CartInspect(cartid: Int!): Product!
-    CartPurchase: Boolean
+    CartPurchase: Boolean!
 
     ProfileGet: User!
     ProfileUpdate(email: String, name: String, surname: String, gender: String, password: String): User!
 
     History: [Product!]
 
-    CommentAdd(content: String!, productid: Int!): Boolean
-    CommentRemove(commentid: Int!): Boolean
-    CommentUpdate(commentid: Int!): Boolean
+    CommentAdd(content: String!, productid: Int!): Boolean!
+    CommentRemove(commentid: Int!): Boolean!
+    CommentUpdate(commentid: Int!): Boolean!
 
-    StoreAdd(product: NewProduct!): Boolean
-    StoreRemove(productid: Int!): Boolean
-    StoreUpdate(productid: Int!, product: NewProduct!): Boolean
+    StoreAdd(product: NewProduct!): Boolean!
+    StoreRemove(productid: Int!): Boolean!
+    StoreUpdate(productid: Int!, product: NewProduct!): Boolean!
 }

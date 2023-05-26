@@ -97,21 +97,21 @@ type QueryResolver interface {
 	Search(ctx context.Context, name *string, categories *string, lowerPrice *float64, highestPrice *float64) ([]*model.Product, error)
 	Product(ctx context.Context, id int) (*model.Product, error)
 	Comments(ctx context.Context, productid int, from *int, count *int) ([]*model.Comment, error)
-	Register(ctx context.Context, email string, name string, surname string, gender string, password string) (string, error)
-	Login(ctx context.Context, email string, password string) (string, error)
-	CartAdd(ctx context.Context, productid int) (*bool, error)
-	CartRemove(ctx context.Context, cartid int) (*bool, error)
+	Register(ctx context.Context, email string, name string, surname string, gender string, password string) (bool, error)
+	Login(ctx context.Context, email string, password string) (bool, error)
+	CartAdd(ctx context.Context, productid int) (bool, error)
+	CartRemove(ctx context.Context, cartid int) (bool, error)
 	CartInspect(ctx context.Context, cartid int) (*model.Product, error)
-	CartPurchase(ctx context.Context) (*bool, error)
+	CartPurchase(ctx context.Context) (bool, error)
 	ProfileGet(ctx context.Context) (*model.User, error)
 	ProfileUpdate(ctx context.Context, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error)
 	History(ctx context.Context) ([]*model.Product, error)
-	CommentAdd(ctx context.Context, content string, productid int) (*bool, error)
-	CommentRemove(ctx context.Context, commentid int) (*bool, error)
-	CommentUpdate(ctx context.Context, commentid int) (*bool, error)
-	StoreAdd(ctx context.Context, product model.NewProduct) (*bool, error)
-	StoreRemove(ctx context.Context, productid int) (*bool, error)
-	StoreUpdate(ctx context.Context, productid int, product model.NewProduct) (*bool, error)
+	CommentAdd(ctx context.Context, content string, productid int) (bool, error)
+	CommentRemove(ctx context.Context, commentid int) (bool, error)
+	CommentUpdate(ctx context.Context, commentid int) (bool, error)
+	StoreAdd(ctx context.Context, product model.NewProduct) (bool, error)
+	StoreRemove(ctx context.Context, productid int) (bool, error)
+	StoreUpdate(ctx context.Context, productid int, product model.NewProduct) (bool, error)
 }
 
 type executableSchema struct {
@@ -442,7 +442,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.Name(childComplexity), true
 
-	case "User.Role":
+	case "User.role":
 		if e.complexity.User.Role == nil {
 			break
 		}
@@ -1666,9 +1666,9 @@ func (ec *executionContext) _Query_register(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_register(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1678,7 +1678,7 @@ func (ec *executionContext) fieldContext_Query_register(ctx context.Context, fie
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -1721,9 +1721,9 @@ func (ec *executionContext) _Query_login(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1733,7 +1733,7 @@ func (ec *executionContext) fieldContext_Query_login(ctx context.Context, field 
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	defer func() {
@@ -1771,11 +1771,14 @@ func (ec *executionContext) _Query_CartAdd(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_CartAdd(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1823,11 +1826,14 @@ func (ec *executionContext) _Query_CartRemove(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_CartRemove(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1944,11 +1950,14 @@ func (ec *executionContext) _Query_CartPurchase(ctx context.Context, field graph
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_CartPurchase(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2015,7 +2024,7 @@ func (ec *executionContext) fieldContext_Query_ProfileGet(ctx context.Context, f
 				return ec.fieldContext_User_gender(ctx, field)
 			case "date":
 				return ec.fieldContext_User_date(ctx, field)
-			case "Role":
+			case "role":
 				return ec.fieldContext_User_Role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
@@ -2075,7 +2084,7 @@ func (ec *executionContext) fieldContext_Query_ProfileUpdate(ctx context.Context
 				return ec.fieldContext_User_gender(ctx, field)
 			case "date":
 				return ec.fieldContext_User_date(ctx, field)
-			case "Role":
+			case "role":
 				return ec.fieldContext_User_Role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
@@ -2171,11 +2180,14 @@ func (ec *executionContext) _Query_CommentAdd(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_CommentAdd(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2223,11 +2235,14 @@ func (ec *executionContext) _Query_CommentRemove(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_CommentRemove(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2275,11 +2290,14 @@ func (ec *executionContext) _Query_CommentUpdate(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_CommentUpdate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2327,11 +2345,14 @@ func (ec *executionContext) _Query_StoreAdd(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_StoreAdd(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2379,11 +2400,14 @@ func (ec *executionContext) _Query_StoreRemove(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_StoreRemove(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2431,11 +2455,14 @@ func (ec *executionContext) _Query_StoreUpdate(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_StoreUpdate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5008,6 +5035,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_CartAdd(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5028,6 +5058,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_CartRemove(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5071,6 +5104,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_CartPurchase(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5157,6 +5193,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_CommentAdd(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5177,6 +5216,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_CommentRemove(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5197,6 +5239,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_CommentUpdate(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5217,6 +5262,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_StoreAdd(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5237,6 +5285,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_StoreRemove(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5257,6 +5308,9 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_StoreUpdate(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -5342,7 +5396,7 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Role":
+		case "role":
 
 			out.Values[i] = ec._User_Role(ctx, field, obj)
 

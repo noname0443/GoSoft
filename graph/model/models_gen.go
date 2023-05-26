@@ -40,7 +40,7 @@ type User struct {
 	Surname string `json:"surname"`
 	Gender  string `json:"gender"`
 	Date    string `json:"date"`
-	Role    Roles  `json:"Role"`
+	Role    Roles  `json:"role"`
 }
 
 type Roles string

@@ -9,12 +9,12 @@ import (
 
 var PostgreSQL *sql.DB
 
-func checkConnection(){
+func checkConnection() {
 	var err error
-	if PostgreSQL != nil{
+	if PostgreSQL != nil {
 		err = PostgreSQL.Ping()
 	}
-	if err != nil || PostgreSQL == nil {
+	for err != nil || PostgreSQL == nil {
 		log.Println("Reconnect to DB")
 		err, configs := Utility.GetConfig("config.ini") // TODO: Get from env
 		if err != nil {
