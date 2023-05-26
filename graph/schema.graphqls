@@ -22,6 +22,11 @@ type Product {
     price: Float!
 }
 
+type CartItem {
+    product: Product!
+    count: Int!
+}
+
 type Comment {
     id: ID!
     userid: ID!
@@ -47,18 +52,19 @@ type Query {
     login(email: String!, password: String!): Boolean!
 
     CartAdd(productid: Int!, count: Int!): Boolean!
-    CartRemove(cartid: Int!, count: Int!): Boolean!
-    CartInspect(cartid: Int!): Product!
+    CartRemove(productid: Int!, count: Int!): Boolean!
+    CartInspect(productid: Int!): CartItem!
+    CartGet: [CartItem!]
     CartPurchase: Boolean!
 
     ProfileGet: User!
     ProfileUpdate(email: String, name: String, surname: String, gender: String, password: String): User!
 
-    History: [Product!]
+    History: [CartItem!]
 
     CommentAdd(content: String!, productid: Int!): Boolean!
     CommentRemove(commentid: Int!): Boolean!
-    CommentUpdate(commentid: Int!): Boolean!
+    CommentUpdate(commentid: Int!, content: String!): Boolean!
 
     StoreAdd(product: NewProduct!): Boolean!
     StoreRemove(productid: Int!): Boolean!

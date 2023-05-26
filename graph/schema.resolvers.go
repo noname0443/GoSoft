@@ -9,6 +9,7 @@ import (
 	"GoSoft/Utility"
 	"GoSoft/graph/model"
 	"context"
+	"errors"
 	"fmt"
 	"math"
 )
@@ -115,18 +116,83 @@ func (r *queryResolver) Login(ctx context.Context, email string, password string
 }
 
 // CartAdd is the resolver for the CartAdd field.
-func (r *queryResolver) CartAdd(ctx context.Context, productid int) (bool, error) {
-	panic(fmt.Errorf("not implemented: CartAdd - CartAdd"))
+func (r *queryResolver) CartAdd(ctx context.Context, productid int, count int) (bool, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return false, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return false, errors.New("you have to log in")
+	}
+	err = DBMS.CartAdd(token, productid, count)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // CartRemove is the resolver for the CartRemove field.
-func (r *queryResolver) CartRemove(ctx context.Context, cartid int) (bool, error) {
-	panic(fmt.Errorf("not implemented: CartRemove - CartRemove"))
+func (r *queryResolver) CartRemove(ctx context.Context, productid int, count int) (bool, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return false, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return false, errors.New("you have to log in")
+	}
+	err = DBMS.CartRemove(token, productid, count)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // CartInspect is the resolver for the CartInspect field.
-func (r *queryResolver) CartInspect(ctx context.Context, cartid int) (*model.Product, error) {
-	panic(fmt.Errorf("not implemented: CartInspect - CartInspect"))
+func (r *queryResolver) CartInspect(ctx context.Context, productid int) (*model.CartItem, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return nil, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return nil, errors.New("you have to log in")
+	}
+	item, err := DBMS.CartGetItem(token, productid)
+	if err != nil {
+		return nil, err
+	}
+	return item, nil
+}
+
+// CartGet is the resolver for the CartGet field.
+func (r *queryResolver) CartGet(ctx context.Context) ([]*model.CartItem, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return nil, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return nil, errors.New("you have to log in")
+	}
+	cart, err := DBMS.CartGet(token)
+	if err != nil {
+		return nil, err
+	}
+	return cart, nil
 }
 
 // CartPurchase is the resolver for the CartPurchase field.
@@ -144,7 +210,9 @@ func (r *queryResolver) ProfileGet(ctx context.Context) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	DBMS.ValidateToken(token)
+	if !DBMS.ValidateToken(token) {
+		return nil, errors.New("you have to log in")
+	}
 	profile, err := DBMS.GetProfile(token)
 	if err != nil {
 		return nil, err
@@ -199,7 +267,9 @@ func (r *queryResolver) ProfileUpdate(ctx context.Context, email *string, name *
 		preparedPassword = *password
 	}
 
-	DBMS.ValidateToken(token)
+	if !DBMS.ValidateToken(token) {
+		return nil, errors.New("you have to log in")
+	}
 	err = DBMS.UpdateProfile(token, preparedEmail, preparedName, preparedSurname, preparedGender, preparedPassword)
 	if err != nil {
 		return nil, err
@@ -212,23 +282,68 @@ func (r *queryResolver) ProfileUpdate(ctx context.Context, email *string, name *
 }
 
 // History is the resolver for the History field.
-func (r *queryResolver) History(ctx context.Context) ([]*model.Product, error) {
+func (r *queryResolver) History(ctx context.Context) ([]*model.CartItem, error) {
 	panic(fmt.Errorf("not implemented: History - History"))
 }
 
 // CommentAdd is the resolver for the CommentAdd field.
 func (r *queryResolver) CommentAdd(ctx context.Context, content string, productid int) (bool, error) {
-	panic(fmt.Errorf("not implemented: CommentAdd - CommentAdd"))
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return false, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return false, errors.New("you have to log in")
+	}
+	err = DBMS.AddComment(token, productid, content)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // CommentRemove is the resolver for the CommentRemove field.
 func (r *queryResolver) CommentRemove(ctx context.Context, commentid int) (bool, error) {
-	panic(fmt.Errorf("not implemented: CommentRemove - CommentRemove"))
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return false, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return false, errors.New("you have to log in")
+	}
+	err = DBMS.RemoveComment(token, commentid)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // CommentUpdate is the resolver for the CommentUpdate field.
-func (r *queryResolver) CommentUpdate(ctx context.Context, commentid int) (bool, error) {
-	panic(fmt.Errorf("not implemented: CommentUpdate - CommentUpdate"))
+func (r *queryResolver) CommentUpdate(ctx context.Context, commentid int, content string) (bool, error) {
+	gc, err := Utility.GinContextFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	token, err := gc.Cookie("GoSoftToken")
+	if err != nil {
+		return false, err
+	}
+	if !DBMS.ValidateToken(token) {
+		return false, errors.New("you have to log in")
+	}
+	err = DBMS.UpdateComment(token, commentid, content)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // StoreAdd is the resolver for the StoreAdd field.

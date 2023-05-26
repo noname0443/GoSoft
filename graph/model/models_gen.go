@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+type CartItem struct {
+	Product *Product `json:"product"`
+	Count   int      `json:"count"`
+}
+
 type Comment struct {
 	ID        string `json:"id"`
 	Userid    string `json:"userid"`

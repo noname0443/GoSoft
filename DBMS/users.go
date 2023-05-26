@@ -37,15 +37,42 @@ func ValidateToken(token string) bool {
 	return true
 }
 
+func ValidatePrivileges(token string, role string) bool {
+	checkConnection()
+	rows, err := PostgreSQL.Query(`SELECT tokendate FROM users WHERE token = $1 AND role = $2`, token, role)
+	if err != nil {
+		return false
+	}
+	if !rows.Next() {
+		return false
+	}
+	var date time.Time
+	err = rows.Scan(&date)
+	if err != nil {
+		return false
+	}
+	if time.Since(date) > (time.Hour * 72) {
+		return false
+	}
+	return true
+}
+
 func RegisterCustomer(email string, name string, surname string, gender string, password string) (string, error) {
 	checkConnection()
 	encpassword := SHA1(password)
 	token := GenerateToken(password)
-	_, err := PostgreSQL.Query(`
+	result, err := PostgreSQL.Exec(`
 INSERT INTO users(email, name, surname, password, gender, token, tokendate, registrationdate, role)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`, email, name, surname, encpassword, gender, token, time.Now(), time.Now(), "customer")
 	if err != nil {
 		return "", err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		return "", errors.New("can't register this user")
 	}
 	return token, nil
 }
@@ -62,9 +89,16 @@ func LoginCustomer(email string, password string) (string, error) {
 	}
 
 	token := GenerateToken(password)
-	_, err = PostgreSQL.Query(`UPDATE users SET token = $1, tokendate =  $2 WHERE email = $3 AND password = $4`, token, time.Now(), email, SHA1(password))
+	result, err := PostgreSQL.Exec(`UPDATE users SET token = $1, tokendate =  $2 WHERE email = $3 AND password = $4`, token, time.Now(), email, SHA1(password))
 	if err != nil {
 		return "", err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return "", err
+	}
+	if count == 0 {
+		return "", errors.New("user not found")
 	}
 	return token, nil
 }
@@ -91,7 +125,7 @@ func GetProfile(token string) (*model.User, error) {
 
 func UpdateProfile(token string, email string, name string, surname string, gender string, password string) error {
 	checkConnection()
-	_, err := PostgreSQL.Query(`
+	result, err := PostgreSQL.Exec(`
 UPDATE users 
 SET 
   email = CASE 
@@ -113,10 +147,18 @@ SET
   password = CASE 
              WHEN length($5) > 0 THEN $5
              ELSE password
-           END;
-`, email, name, surname, gender, password)
+           END
+  WHERE token = $6;
+`, email, name, surname, gender, password, token)
 	if err != nil {
 		return err
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("user not found")
 	}
 	return nil
 }

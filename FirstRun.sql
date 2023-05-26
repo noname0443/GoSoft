@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS Store (
 );
 
 CREATE TABLE IF NOT EXISTS CART (
-                                    UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
-                                    ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
-                                    Count INTEGER
+                                    UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                                    ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                                    Count INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Categories (
@@ -44,13 +44,14 @@ CREATE TABLE IF NOT EXISTS Purchase (
                                         DateTime TIMESTAMP NOT NULL,
                                         ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
                                         UserDescription TEXT,
-                                        Price REAL NOT NULL
+                                        Price REAL NOT NULL,
+                                        OrderID INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Comment (
                                        CommentID SERIAL PRIMARY KEY,
                                        Date TIMESTAMP NOT NULL,
-                                       UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE,
-                                       ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
+                                       UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
+                                       ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
                                        Content TEXT NOT NULL
 );
