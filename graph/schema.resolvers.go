@@ -190,7 +190,7 @@ func (r *queryResolver) CartPurchase(ctx context.Context) (bool, error) {
 	if !DBMS.ValidateToken(token) {
 		return false, errors.New("you have to log in")
 	}
-	err = DBMS.CartPurchase(token)
+	err = DBMS.CartPurchase(token, "1")
 	if err != nil {
 		return false, err
 	}
@@ -291,7 +291,7 @@ func (r *queryResolver) History(ctx context.Context) ([]*model.Purchase, error) 
 	if !DBMS.ValidateToken(token) {
 		return nil, errors.New("you have to log in")
 	}
-	history, err := DBMS.CartHistory(token)
+	history, err := DBMS.PurchasedSoftware(token)
 	if err != nil {
 		return nil, err
 	}

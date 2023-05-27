@@ -10,7 +10,6 @@ function submitComment() {
                 content: \"${document.getElementById('comment').value}\") }`
         })
     }).then(r => r.json()).then(data => {
-        console.log(data)
         window.location.reload();
     });
 }
@@ -27,7 +26,10 @@ function addToCart(){
                 count: ${parseInt(document.getElementById('soft-duration').value)}) }`
         })
     }).then(r => r.json()).then(data => {
-        console.log(data);
-        alert("Successfully added to cart!")
+        if(data['errors'] === undefined){
+            window.location = "/cart"
+        } else {
+            window.location = "/profile"
+        }
     });
 }

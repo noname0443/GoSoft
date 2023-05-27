@@ -7,6 +7,7 @@ require github.com/gin-gonic/gin v1.9.0
 require (
 	github.com/99designs/gqlgen v0.17.31
 	github.com/lib/pq v1.10.9
+	github.com/plutov/paypal/v4 v4.7.0
 	github.com/vektah/gqlparser/v2 v2.5.1
 )
 

@@ -5,6 +5,7 @@ import (
 	"GoSoft/graph"
 	"context"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/lib/pq"
+	"github.com/plutov/paypal/v4"
 )
 
 const defaultPort = "8080"
@@ -45,6 +47,17 @@ func main() {
 		port = defaultPort
 	}
 
+	paypal_handler, err := paypal.NewClient("AYZy3f-tqV9_YZOIavMunW1q4RXxrWVZLaeuHk2sX7BIzS7wHfEB3pLZmZtaqv4bDTM5XysCytmeGaNg",
+		"EH6ImKiJycjZ-UKQE2C9-6ULvMj2b_DKDYxPGI-AFMG02N5Gs0nyAXFXZY3KJz3xAZvbZ5CL3jQOYOLH", paypal.APIBaseSandBox)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	_, err = paypal_handler.GetAccessToken(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	router := gin.Default()
 	router.LoadHTMLGlob("template/*")
 	router.Use(GinContextToContextMiddleware())
@@ -69,7 +82,7 @@ func main() {
 				c.AbortWithStatus(404)
 				return
 			}
-			history, err := DBMS.CartHistory(token)
+			history, err := DBMS.PurchasedSoftware(token)
 			if err != nil {
 				c.AbortWithStatus(404)
 				return
@@ -130,22 +143,110 @@ func main() {
 				return
 			}
 			var subtotal []float64
+			var productids []int
 			sum := 0.0
 			for _, v := range cart {
 				price := v.Product.Price * float64(v.Count)
 				sum += price
 				subtotal = append(subtotal, price)
+
+				parseInt, err := strconv.ParseInt(v.Product.ID, 10, 32)
+				if err != nil {
+					return
+				}
+				productids = append(productids, int(parseInt))
 			}
 			c.HTML(http.StatusOK, "cart.html", gin.H{
-				"cart":     cart,
-				"sum":      sum,
-				"subtotal": subtotal,
+				"cart":       cart,
+				"sum":        sum,
+				"subtotal":   subtotal,
+				"productids": productids,
 			})
 			return
 		} else {
 			c.HTML(http.StatusOK, "register.html", gin.H{})
 			return
 		}
+	})
+	router.POST("/paypal/create-paypal-order", func(c *gin.Context) {
+		token, err := c.Cookie("GoSoftToken")
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+		if !DBMS.ValidateToken(token) {
+			c.AbortWithStatus(400)
+			return
+		}
+		cart, err := DBMS.CartGet(token)
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+
+		sum := 0.0
+		for _, v := range cart {
+			price := v.Product.Price * float64(v.Count)
+			sum += price
+		}
+		order, err := paypal_handler.CreateOrder(c, "CAPTURE",
+			[]paypal.PurchaseUnitRequest{{
+				Amount: &paypal.PurchaseUnitAmount{
+					Currency:  "USD",
+					Value:     strconv.FormatFloat(sum, 'f', -1, 64),
+					Breakdown: nil,
+				},
+			},
+			}, nil, nil)
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+
+		err = DBMS.CartPurchase(token, order.ID)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(400)
+			return
+		}
+
+		c.JSON(200, order)
+	})
+	router.POST("/paypal/capture-paypal-order", func(c *gin.Context) {
+		token, err := c.Cookie("GoSoftToken")
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+		type Order struct {
+			OrderID string `json:"orderID"`
+		}
+		var order Order
+		err = c.Bind(&order)
+		if err != nil {
+			return
+		}
+		getOrder, err := paypal_handler.GetOrder(c, order.OrderID)
+		if err != nil {
+			return
+		}
+		log.Println(getOrder)
+		log.Println(getOrder.Status)
+		if getOrder.Status != "APPROVED" {
+			c.AbortWithStatus(400)
+		}
+		captureOrder, err := paypal_handler.CaptureOrder(c, order.OrderID, paypal.CaptureOrderRequest{})
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+		err = DBMS.CartMakePaid(token, captureOrder.ID)
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+
+		c.Status(200)
 	})
 	router.Run()
 }

@@ -36,7 +36,16 @@ func CartAdd(token string, productid int, count int) error {
 		return errors.New("count less or equal then zero")
 	}
 	checkConnection()
-	_, err := PostgreSQL.Query(`
+	err := removeOldSoftware()
+	if err != nil {
+		return err
+	}
+	rows, err := PostgreSQL.Query(`SELECT * FROM purchase WHERE userid = (SELECT userid FROM users WHERE token = $1) AND productid = $2`, token, productid)
+	if rows.Next() {
+		return errors.New("software already bought")
+	}
+
+	_, err = PostgreSQL.Query(`
 INSERT INTO cart (userid, productid, count)
 SELECT userid, $1, $2
 FROM users 
@@ -52,15 +61,7 @@ ON CONFLICT (userid, productid) DO UPDATE SET count = cart.count + $2;
 func CartRemove(token string, productid int, count int) error {
 	checkConnection()
 	result, err := PostgreSQL.Exec(`
-WITH updated AS (
-  UPDATE cart
-  SET count = count - $3
-  WHERE productid = $2
-    AND userid = (SELECT userid FROM users WHERE token = $1)
-  RETURNING *
-)
-DELETE FROM cart
-WHERE productid = $2 AND count <= 0;`, token, productid, count)
+UPDATE cart SET count = count - $3 WHERE productid = $2 AND userid = (SELECT userid FROM users WHERE token = $1);`, token, productid, count)
 	affected, err := result.RowsAffected()
 	if err != nil {
 		return err
@@ -98,12 +99,13 @@ FROM public.cart INNER JOIN store ON store.productid = cart.productid
 	return p, nil
 }
 
-func CartPurchase(token string) error {
+func CartPurchase(token string, orderID string) error {
 	checkConnection()
 	result, err := PostgreSQL.Exec(`
-INSERT INTO purchase (productid, userid, datetime, subscriptiontype, price, count, paid)
-	(SELECT productid, userid, $2, (SELECT subscriptiontype, price FROM store WHERE cart.productid = productid), count, FALSE
-		FROM cart WHERE userid = (SELECT userid FROM users WHERE token = $1));`, token, time.Now())
+INSERT INTO purchase (productid, userid, datetime, subscriptiontype, price, count, paid, orderid)
+	(SELECT productid, userid, $2, (SELECT subscriptiontype FROM store WHERE cart.productid = productid),
+	        (SELECT price FROM store WHERE cart.productid = productid), count, FALSE, $3
+		FROM cart WHERE userid = (SELECT userid FROM users WHERE token = $1));`, token, time.Now(), orderID)
 	if err != nil {
 		return err
 	}
@@ -126,8 +128,12 @@ DELETE FROM cart WHERE userid = (SELECT userid FROM users WHERE token = $1);`, t
 	return nil
 }
 
-func CartHistory(token string) ([]*model.Purchase, error) {
+func PurchasedSoftware(token string) ([]*model.Purchase, error) {
 	checkConnection()
+	err := removeOldSoftware()
+	if err != nil {
+		return nil, err
+	}
 	rows, err := PostgreSQL.Query(`
 SELECT purchase.productid, name, description, photo, file, purchase.price, count, purchase.subscriptiontype, datetime FROM purchase INNER JOIN store
 ON purchase.productid = store.productid WHERE userid = (SELECT userid FROM users WHERE token = $1) AND paid = TRUE ORDER BY datetime DESC;
@@ -147,4 +153,29 @@ ON purchase.productid = store.productid WHERE userid = (SELECT userid FROM users
 		products = append(products, item)
 	}
 	return products, nil
+}
+
+func CartMakePaid(token string, orderID string) error {
+	checkConnection()
+	_, err := PostgreSQL.Exec(`
+UPDATE purchase
+	SET paid=TRUE
+	WHERE orderid = $2 AND userid = (SELECT userid FROM users WHERE token = $1);
+`, token, orderID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func removeOldSoftware() error {
+	checkConnection()
+	_, err := PostgreSQL.Query(`
+DELETE FROM purchase
+WHERE (now() > (datetime + INTERVAL '1 month' * count) AND subscriptiontype = 'month')
+OR (now() > (datetime + INTERVAL '1 year' * count) AND subscriptiontype = 'year');`)
+	if err != nil {
+		return err
+	}
+	return nil
 }

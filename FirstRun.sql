@@ -33,8 +33,25 @@ CREATE TABLE IF NOT EXISTS CART (
                                     UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
                                     ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
                                     Count INTEGER NOT NULL,
-                                    CONSTRAINT unique_user_product UNIQUE (userid, productid)
+                                    CONSTRAINT unique_user_product UNIQUE (userid, productid),
+                                    CONSTRAINT cartCountTrigger CHECK (Count > 0)
 );
+
+CREATE OR REPLACE FUNCTION cartClearer()
+    RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.Count <= 0 THEN
+        DELETE FROM CART WHERE UserID = NEW.UserID AND ProductID = NEW.ProductID;
+        RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER cartCountTrigger
+    BEFORE INSERT OR UPDATE ON CART
+    FOR EACH ROW
+EXECUTE FUNCTION cartClearer();
 
 CREATE TABLE IF NOT EXISTS Categories (
                                           ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -46,7 +63,7 @@ CREATE TABLE IF NOT EXISTS Purchase (
                                         DateTime TIMESTAMP NOT NULL,
                                         ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
                                         Price REAL NOT NULL,
-                                        OrderID SERIAL NOT NULL,
+                                        OrderID TEXT NOT NULL,
                                         Paid BOOLEAN NOT NULL,
                                         Count INTEGER NOT NULL,
                                         SubscriptionType TEXT NOT NULL

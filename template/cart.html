@@ -5,6 +5,7 @@
     <title>Your Cart</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../assets/cart.css">
+    <script src="/assets/cart.js"></script>
 </head>
 <body>
 {{ template "header.html" }}
@@ -17,6 +18,7 @@
             <th>Price</th>
             <th>Duration</th>
             <th>Subscription Type</th>
+            <th>Remove from cart</th>
             <th>Subtotal</th>
         </tr>
         </thead>
@@ -24,21 +26,65 @@
         {{range $key, $value := .cart}}
         <tr>
             <td>{{ $value.Product.Name }}</td>
-            <td>{{ $value.Product.Price }}</td>
+            <td>${{ $value.Product.Price }}</td>
             <td>{{ $value.Count }}</td>
             <td>{{ $value.Product.Subscriptiontype }}</td>
-            <td>{{ index $.subtotal $key }}</td>
+            <td><button onclick="removeFromCart({{ index $.productids $key }}, {{ $value.Count }})">Delete</button></td>
+            <td>${{ index $.subtotal $key }}</td>
         </tr>
         {{end}}
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="4">Total:</td>
-            <td>{{ .sum }}</td>
+            <td colspan="5">Total:</td>
+            <td>${{ .sum }}</td>
         </tr>
         </tfoot>
     </table>
-    <a href="#" class="btn">Checkout</a>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYZy3f-tqV9_YZOIavMunW1q4RXxrWVZLaeuHk2sX7BIzS7wHfEB3pLZmZtaqv4bDTM5XysCytmeGaNg&currency=USD"></script>
+    <div id="paypal-button-container"></div>
+    {{ if gt (len .cart) 0 }}
+    <script>
+        paypal.Buttons({
+            // Order is created on the server and the order id is returned
+            createOrder() {
+                return fetch("/paypal/create-paypal-order", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    // use the "body" param to optionally pass additional order information
+                    // like product skus and quantities
+                    body: JSON.stringify({
+                        cart: [
+                            {
+                                sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
+                                quantity: "YOUR_PRODUCT_QUANTITY",
+                            },
+                        ],
+                    }),
+                })
+                    .then((response) => response.json())
+                    .then((order) => order.id);
+            },
+            onApprove(data) {
+                return fetch("/paypal/capture-paypal-order", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        orderID: data.orderID
+                    })
+                })
+                    .then((response) => response.json())
+                    .then((orderData) => {
+                        window.location.reload();
+                    });
+            }
+        }).render('#paypal-button-container');
+    </script>
+    {{ end }}
 </div>
 {{ template "footer.html" }}
 </body>
