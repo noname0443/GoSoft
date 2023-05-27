@@ -50,6 +50,12 @@ type Product struct {
 	Subscriptiontype string  `json:"subscriptiontype"`
 }
 
+type Purchase struct {
+	Product *Product `json:"product"`
+	Count   int      `json:"count"`
+	Date    string   `json:"date"`
+}
+
 type User struct {
 	ID      string `json:"id"`
 	Email   string `json:"email"`

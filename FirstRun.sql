@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS Store (
 CREATE TABLE IF NOT EXISTS CART (
                                     UserID INTEGER REFERENCES Users(UserID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
                                     ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
-                                    Count INTEGER NOT NULL
+                                    Count INTEGER NOT NULL,
+                                    CONSTRAINT unique_user_product UNIQUE (userid, productid)
 );
 
 CREATE TABLE IF NOT EXISTS Categories (
@@ -44,7 +45,6 @@ CREATE TABLE IF NOT EXISTS Purchase (
                                         UserID INTEGER REFERENCES Users(UserID),
                                         DateTime TIMESTAMP NOT NULL,
                                         ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
-                                        UserDescription TEXT,
                                         Price REAL NOT NULL,
                                         OrderID SERIAL NOT NULL,
                                         Paid BOOLEAN NOT NULL,

@@ -77,6 +77,12 @@ type ComplexityRoot struct {
 		Subscriptiontype func(childComplexity int) int
 	}
 
+	Purchase struct {
+		Count   func(childComplexity int) int
+		Date    func(childComplexity int) int
+		Product func(childComplexity int) int
+	}
+
 	Query struct {
 		CartAdd       func(childComplexity int, productid int, count int) int
 		CartGet       func(childComplexity int) int
@@ -123,7 +129,7 @@ type QueryResolver interface {
 	CartPurchase(ctx context.Context) (bool, error)
 	ProfileGet(ctx context.Context) (*model.User, error)
 	ProfileUpdate(ctx context.Context, email *string, name *string, surname *string, gender *string, password *string) (*model.User, error)
-	History(ctx context.Context) ([]*model.CartItem, error)
+	History(ctx context.Context) ([]*model.Purchase, error)
 	CommentAdd(ctx context.Context, content string, productid int) (bool, error)
 	CommentRemove(ctx context.Context, commentid int) (bool, error)
 	CommentUpdate(ctx context.Context, commentid int, content string) (bool, error)
@@ -293,6 +299,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Product.Subscriptiontype(childComplexity), true
+
+	case "Purchase.count":
+		if e.complexity.Purchase.Count == nil {
+			break
+		}
+
+		return e.complexity.Purchase.Count(childComplexity), true
+
+	case "Purchase.date":
+		if e.complexity.Purchase.Date == nil {
+			break
+		}
+
+		return e.complexity.Purchase.Date(childComplexity), true
+
+	case "Purchase.product":
+		if e.complexity.Purchase.Product == nil {
+			break
+		}
+
+		return e.complexity.Purchase.Product(childComplexity), true
 
 	case "Query.CartAdd":
 		if e.complexity.Query.CartAdd == nil {
@@ -1995,6 +2022,154 @@ func (ec *executionContext) fieldContext_Product_subscriptiontype(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Purchase_product(ctx context.Context, field graphql.CollectedField, obj *model.Purchase) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Purchase_product(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Product, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Product)
+	fc.Result = res
+	return ec.marshalNProduct2ᚖGoSoftᚋgraphᚋmodelᚐProduct(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Purchase_product(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Purchase",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Product_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Product_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Product_description(ctx, field)
+			case "photo":
+				return ec.fieldContext_Product_photo(ctx, field)
+			case "file":
+				return ec.fieldContext_Product_file(ctx, field)
+			case "price":
+				return ec.fieldContext_Product_price(ctx, field)
+			case "subscriptiontype":
+				return ec.fieldContext_Product_subscriptiontype(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Purchase_count(ctx context.Context, field graphql.CollectedField, obj *model.Purchase) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Purchase_count(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Count, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Purchase_count(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Purchase",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Purchase_date(ctx context.Context, field graphql.CollectedField, obj *model.Purchase) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Purchase_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Purchase_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Purchase",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_search(ctx, field)
 	if err != nil {
@@ -2734,9 +2909,9 @@ func (ec *executionContext) _Query_History(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.CartItem)
+	res := resTmp.([]*model.Purchase)
 	fc.Result = res
-	return ec.marshalOCartItem2ᚕᚖGoSoftᚋgraphᚋmodelᚐCartItemᚄ(ctx, field.Selections, res)
+	return ec.marshalOPurchase2ᚕᚖGoSoftᚋgraphᚋmodelᚐPurchaseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_History(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2748,11 +2923,13 @@ func (ec *executionContext) fieldContext_Query_History(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "product":
-				return ec.fieldContext_CartItem_product(ctx, field)
+				return ec.fieldContext_Purchase_product(ctx, field)
 			case "count":
-				return ec.fieldContext_CartItem_count(ctx, field)
+				return ec.fieldContext_Purchase_count(ctx, field)
+			case "date":
+				return ec.fieldContext_Purchase_date(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type CartItem", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Purchase", field.Name)
 		},
 	}
 	return fc, nil
@@ -5611,6 +5788,48 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var purchaseImplementors = []string{"Purchase"}
+
+func (ec *executionContext) _Purchase(ctx context.Context, sel ast.SelectionSet, obj *model.Purchase) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, purchaseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Purchase")
+		case "product":
+
+			out.Values[i] = ec._Purchase_product(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "count":
+
+			out.Values[i] = ec._Purchase_count(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "date":
+
+			out.Values[i] = ec._Purchase_date(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -6663,6 +6882,16 @@ func (ec *executionContext) marshalNProduct2ᚖGoSoftᚋgraphᚋmodelᚐProduct(
 	return ec._Product(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNPurchase2ᚖGoSoftᚋgraphᚋmodelᚐPurchase(ctx context.Context, sel ast.SelectionSet, v *model.Purchase) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Purchase(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNRoles2GoSoftᚋgraphᚋmodelᚐRoles(ctx context.Context, v interface{}) (model.Roles, error) {
 	var res model.Roles
 	err := res.UnmarshalGQL(v)
@@ -7042,6 +7271,53 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
+}
+
+func (ec *executionContext) marshalOPurchase2ᚕᚖGoSoftᚋgraphᚋmodelᚐPurchaseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Purchase) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPurchase2ᚖGoSoftᚋgraphᚋmodelᚐPurchase(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

@@ -1,61 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Your Cart | Software Trading Company</title>
+    {{ template "head.html" }}
+    <title>Your Cart</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/cart.css">
 </head>
 <body>
-<div class="header">
-    <h1>Software Trading Company</h1>
-    <nav>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-            <li><a href="#">Cart</a></li>
-        </ul>
-    </nav>
-</div>
+{{ template "header.html" }}
 <div class="cart-items">
     <h2>Your Cart</h2>
     <table>
         <thead>
         <tr>
-            <th>Product Name</th>
+            <th>Software</th>
             <th>Price</th>
-            <th>Quantity</th>
+            <th>Duration</th>
+            <th>Subscription Type</th>
             <th>Subtotal</th>
         </tr>
         </thead>
         <tbody>
+        {{range $key, $value := .cart}}
         <tr>
-            <td>Product 1</td>
-            <td>$99.99</td>
-            <td>1</td>
-            <td>$99.99</td>
+            <td>{{ $value.Product.Name }}</td>
+            <td>{{ $value.Product.Price }}</td>
+            <td>{{ $value.Count }}</td>
+            <td>{{ $value.Product.Subscriptiontype }}</td>
+            <td>{{ index $.subtotal $key }}</td>
         </tr>
-        <tr>
-            <td>Product 2</td>
-            <td>$49.99</td>
-            <td>2</td>
-            <td>$99.98</td>
-        </tr>
-        <!-- You can add more rows here for additional products -->
+        {{end}}
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="3">Total:</td>
-            <td>$199.97</td>
+            <td colspan="4">Total:</td>
+            <td>{{ .sum }}</td>
         </tr>
         </tfoot>
     </table>
     <a href="#" class="btn">Checkout</a>
 </div>
-<div class="footer">
-    <p>&copy; 2023 Software Trading Company. All rights reserved.</p>
-</div>
+{{ template "footer.html" }}
 </body>
 </html>

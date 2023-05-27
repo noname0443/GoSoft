@@ -16,7 +16,10 @@
             </div>
             <div class="product-details">
                 <div class="product-price">${{.product.Price}}/month</div>
-                <button class="buy-button">Buy Now</button>
+                <div style="display: block;">
+                    <input id="soft-duration" type=number placeholder="duration" style="width: 100%; height: 100%; margin: 5px; padding: 20px 20px" value=0></input>
+                    <button class="buy-button" style="width: 100%; margin: 5px" onclick="addToCart()">Add to cart</button>
+                </div>
             </div>
         </div>
 

@@ -23,6 +23,12 @@ type Product {
     subscriptiontype: String!
 }
 
+type Purchase {
+    product: Product!
+    count: Int!
+    date: String!
+}
+
 type CartItem {
     product: Product!
     count: Int!
@@ -72,7 +78,7 @@ type Query {
     ProfileGet: User!
     ProfileUpdate(email: String, name: String, surname: String, gender: String, password: String): User!
 
-    History: [CartItem!]
+    History: [Purchase!]
 
     CommentAdd(content: String!, productid: Int!): Boolean!
     CommentRemove(commentid: Int!): Boolean!

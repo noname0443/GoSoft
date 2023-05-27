@@ -279,7 +279,7 @@ func (r *queryResolver) ProfileUpdate(ctx context.Context, email *string, name *
 }
 
 // History is the resolver for the History field.
-func (r *queryResolver) History(ctx context.Context) ([]*model.CartItem, error) {
+func (r *queryResolver) History(ctx context.Context) ([]*model.Purchase, error) {
 	gc, err := Utility.GinContextFromContext(ctx)
 	if err != nil {
 		return nil, err

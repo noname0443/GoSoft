@@ -13,181 +13,58 @@
     <table id="user-profile">
         <tr>
             <th>User ID</th>
-            <td id="user-id"></td>
+            <td id="user-id">{{.profile.ID}}</td>
         </tr>
         <tr>
             <th>Email</th>
-            <td id="user-email"></td>
+            <td id="user-email">{{.profile.Email}}</td>
         </tr>
         <tr>
             <th>Name</th>
-            <td id="user-name"></td>
+            <td id="user-name">{{.profile.Name}}</td>
         </tr>
         <tr>
             <th>Surname</th>
-            <td id="user-surname"></td>
-        </tr>
-        <tr>
-            <th>Password</th>
-            <td id="user-password"></td>
+            <td id="user-surname">{{.profile.Surname}}</td>
         </tr>
         <tr>
             <th>Gender</th>
-            <td id="user-gender"></td>
-        </tr>
-        <tr>
-            <th>Token</th>
-            <td id="user-token"></td>
-        </tr>
-        <tr>
-            <th>Token Date</th>
-            <td id="user-token-date"></td>
+            <td id="user-gender">{{.profile.Gender}}</td>
         </tr>
         <tr>
             <th>Registration Date</th>
-            <td id="user-registration-date"></td>
+            <td id="user-registration-date">{{.profile.Date}}</td>
         </tr>
         <tr>
             <th>Role</th>
-            <td id="user-role"></td>
+            <td id="user-role">{{.profile.Role}}</td>
         </tr>
     </table>
 </div>
+{{ if gt (len .purchases) 0 }}
 <div class="containerPurchased">
     <h2 style="text-align: center; padding-bottom: 20px">Purchased</h2>
     <ul class="product-list">
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 1</h3>
-                <p>Description of Product 1</p>
-                <p class="product-price">Price: $10.00</p>
+        {{range .purchases}}
+        <li class="product-item" itemid="${array[i]['id']}">
+            <div class="product-info" style="display: flex; height: 200px">
+                <div style="width: 50%">
+                    <img src="{{.Product.Photo}}" style="height: 100%; margin: 0 auto">
+                </div>
+                <div style="width: 50%" id="text">
+                    <h3>{{.Product.Name}}</h3>
+                    <p>Price: ${{.Product.Price}}/{{.Product.Subscriptiontype}}</p>
+                    <p>Subscription Date: {{.Date}}</p>
+                    <p>Subscription duration: {{.Count}}</p>
+                    <p>Subscription type: {{.Product.Subscriptiontype}}</p>
+                </div>
             </div>
-            <button class="add-to-cart">Add to Cart</button>
+            <a class="add-to-cart" href="/files/{{.Product.File}}">Download</a>
         </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 2</h3>
-                <p>Description of Product 2</p>
-                <p class="product-price">Price: $20.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-    </ul>
-    <ul class="product-list">
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 1</h3>
-                <p>Description of Product 1</p>
-                <p class="product-price">Price: $10.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 2</h3>
-                <p>Description of Product 2</p>
-                <p class="product-price">Price: $20.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
-        <li class="product-item">
-            <div class="product-info">
-                <h3>Product 3</h3>
-                <p>Description of Product 3</p>
-                <p class="product-price">Price: $30.00</p>
-            </div>
-            <button class="add-to-cart">Add to Cart</button>
-        </li>
+        {{ end }}
     </ul>
 </div>
+{{ end }}
 {{ template "footer.html" }}
 <script src="../assets/profile.js"></script>
 </body>

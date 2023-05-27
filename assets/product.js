@@ -1,7 +1,3 @@
-const commentForm = document.getElementById('comment-form');
-const commentList = document.getElementById('comment-list');
-
-// Function to submit comment
 function submitComment() {
     fetch('/api', {
         method: 'POST',
@@ -10,7 +6,7 @@ function submitComment() {
         },
         body: JSON.stringify({
             query: `query { CommentAdd(
-                productid: 1,
+                productid: ${parseInt(window.location['pathname'].substr(window.location['pathname'].lastIndexOf('/')+1))},
                 content: \"${document.getElementById('comment').value}\") }`
         })
     }).then(r => r.json()).then(data => {
@@ -19,5 +15,19 @@ function submitComment() {
     });
 }
 
-// Add event listener to comment form
-commentForm.addEventListener('submit', submitComment);
+function addToCart(){
+    fetch('/api', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: `query { CartAdd(
+                productid: ${parseInt(window.location['pathname'].substr(window.location['pathname'].lastIndexOf('/')+1))},
+                count: ${parseInt(document.getElementById('soft-duration').value)}) }`
+        })
+    }).then(r => r.json()).then(data => {
+        console.log(data);
+        alert("Successfully added to cart!")
+    });
+}

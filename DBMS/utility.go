@@ -11,12 +11,14 @@ var PostgreSQL *sql.DB
 
 func checkConnection() {
 	var err error
+	var configs map[string]string
+
 	if PostgreSQL != nil {
 		err = PostgreSQL.Ping()
 	}
 	for err != nil || PostgreSQL == nil {
 		log.Println("Reconnect to DB")
-		err, configs := Utility.GetConfig("config.ini") // TODO: Get from env
+		err, configs = Utility.GetConfig("config.ini") // TODO: Get from env
 		if err != nil {
 			log.Fatal("Can't read config file.")
 		}

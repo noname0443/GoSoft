@@ -1,10 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    {{ template "head.html" }}
+    <link rel="stylesheet" href="/assets/register.css">
+    <script src="/assets/register.js"></script>
 </head>
 <body>
-
+{{ template "header.html" }}
+<div class="form-container">
+    <div class="form-header">
+        <h2>Login or Register</h2>
+    </div>
+    <div class="form-body">
+        <form id="login-form" onsubmit="return false;">
+            <h3>Login</h3>
+            <input type="email" id="email" name="email" placeholder="email">
+            <input type="password" id="password" name="password" placeholder="password">
+            <button type="submit" onclick="login()">Login</button>
+        </form>
+        <form id="register-form" onsubmit="return false;">
+            <h3>Register</h3>
+            <input type="email" id="new-email" name="new-email" placeholder="email">
+            <input type="text" id="new-name" name="new-name" placeholder="name">
+            <input type="text" id="new-surname" name="new-surname" placeholder="surname">
+            <input type="text" id="new-gender" name="new-gender" placeholder="gender">
+            <input type="password" id="new-password" name="new-password" placeholder="password">
+            <input type="password" id="confirm-password" name="confirm-password" placeholder="confirm password">
+            <button type="submit" onclick="register()">Register</button>
+        </form>
+    </div>
+</div>
+{{ template "footer.html" }}
 </body>
 </html>

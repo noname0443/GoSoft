@@ -10,7 +10,7 @@ func GetComments(productid int) ([]*model.ExtendedComment, error) {
 	checkConnection()
 	rows, err := PostgreSQL.Query(`
 SELECT commentid, users.name, users.surname, users.role, date, productid, content
-	FROM public.comment INNER JOIN users ON users.userid = comment.userid WHERE productid = $1;
+	FROM public.comment INNER JOIN users ON users.userid = comment.userid WHERE productid = $1 ORDER BY DATE DESC;
 `,
 		productid)
 	if err != nil {

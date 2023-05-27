@@ -60,14 +60,35 @@ func main() {
 	router.GET("/profile", func(c *gin.Context) {
 		token, err := c.Cookie("GoSoftToken")
 		if err != nil {
-			c.AbortWithStatus(400)
+			c.HTML(http.StatusOK, "register.html", gin.H{})
 			return
 		}
 		if DBMS.ValidateToken(token) {
-			c.HTML(http.StatusOK, "profile.html", gin.H{}) // TODO: Profile rendering
+			profile, err := DBMS.GetProfile(token)
+			if err != nil {
+				c.AbortWithStatus(404)
+				return
+			}
+			history, err := DBMS.CartHistory(token)
+			if err != nil {
+				c.AbortWithStatus(404)
+				return
+			}
+			for _, v := range history {
+				v.Date = v.Date[0:10]
+			}
+			c.HTML(http.StatusOK, "profile.html", gin.H{
+				"profile":   profile,
+				"purchases": history,
+			})
+			return
 		} else {
 			c.HTML(http.StatusOK, "register.html", gin.H{})
+			return
 		}
+	})
+	router.GET("/files/:file", func(c *gin.Context) {
+		// TODO: make file download if product is bought
 	})
 	router.GET("/store/:id", func(c *gin.Context) {
 		productidString := c.Param("id")
@@ -95,6 +116,35 @@ func main() {
 				"comments": comments,
 				"loggedin": DBMS.ValidateToken(token),
 			})
+		}
+	})
+	router.GET("/cart", func(c *gin.Context) {
+		token, err := c.Cookie("GoSoftToken")
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+		if DBMS.ValidateToken(token) {
+			cart, err := DBMS.CartGet(token)
+			if err != nil {
+				return
+			}
+			var subtotal []float64
+			sum := 0.0
+			for _, v := range cart {
+				price := v.Product.Price * float64(v.Count)
+				sum += price
+				subtotal = append(subtotal, price)
+			}
+			c.HTML(http.StatusOK, "cart.html", gin.H{
+				"cart":     cart,
+				"sum":      sum,
+				"subtotal": subtotal,
+			})
+			return
+		} else {
+			c.HTML(http.StatusOK, "register.html", gin.H{})
+			return
 		}
 	})
 	router.Run()

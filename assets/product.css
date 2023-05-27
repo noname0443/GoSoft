@@ -38,7 +38,7 @@ h1 {
 }
 
 .comments button[type="submit"] {
-    background-color: #4CAF50;
+    background-color: #1E90FF;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -47,7 +47,9 @@ h1 {
 }
 
 .comments button[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #fff;
+    color: #1E90FF;
+    border: 1px solid#1E90FF;
 }
 
 .product-section {
@@ -126,7 +128,7 @@ h1 {
     background-color: #1E90FF;
     color: #fff;
     font-size: 18px;
-    padding: 10px 20px;
+    padding: 20px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
