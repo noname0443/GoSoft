@@ -1,27 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Software Trading Company</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="index.css">
+    {{ template "head.html" }}
+    <link rel="stylesheet" href="/assets/index.css">
 </head>
 <body>
-<div class="header">
-    <h1>Software Trading Company</h1>
-    <nav>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact Us</a></li>
-        </ul>
-    </nav>
-</div>
+{{ template "header.html" }}
 <div class="hero">
-    <h2>Welcome to Software Trading Company</h2>
-    <p>We offer a range of cutting-edge software solutions for trading firms of all sizes.</p>
-    <ahref="#" class="btn">Learn More</a>
+    <div class="hero-content">
+        <h2>Welcome to Software Trading Store</h2>
+        <p>We offer a range of cutting-edge software solutions for trading firms of all sizes and common users.</p>
+        <a href="#" class="btn">Learn More</a>
+    </div>
 </div>
 <div class="features">
     <h3>Our Products and Services</h3>
@@ -58,8 +48,6 @@
         <input type="submit" value="Send">
     </form>
 </div>
-<div class="footer">
-    <p>&copy; 2023 Software Trading Company. All rights reserved.</p>
-</div>
+{{ template "footer.html" }}
 </body>
 </html>

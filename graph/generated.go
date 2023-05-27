@@ -57,13 +57,24 @@ type ComplexityRoot struct {
 		Userid    func(childComplexity int) int
 	}
 
+	ExtendedComment struct {
+		Content   func(childComplexity int) int
+		Date      func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Productid func(childComplexity int) int
+		Role      func(childComplexity int) int
+		Surname   func(childComplexity int) int
+	}
+
 	Product struct {
-		Description func(childComplexity int) int
-		File        func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Photo       func(childComplexity int) int
-		Price       func(childComplexity int) int
+		Description      func(childComplexity int) int
+		File             func(childComplexity int) int
+		ID               func(childComplexity int) int
+		Name             func(childComplexity int) int
+		Photo            func(childComplexity int) int
+		Price            func(childComplexity int) int
+		Subscriptiontype func(childComplexity int) int
 	}
 
 	Query struct {
@@ -75,7 +86,7 @@ type ComplexityRoot struct {
 		CommentAdd    func(childComplexity int, content string, productid int) int
 		CommentRemove func(childComplexity int, commentid int) int
 		CommentUpdate func(childComplexity int, commentid int, content string) int
-		Comments      func(childComplexity int, productid int, from *int, count *int) int
+		Comments      func(childComplexity int, productid int) int
 		History       func(childComplexity int) int
 		Login         func(childComplexity int, email string, password string) int
 		Product       func(childComplexity int, id int) int
@@ -102,7 +113,7 @@ type ComplexityRoot struct {
 type QueryResolver interface {
 	Search(ctx context.Context, name *string, categories *string, lowerPrice *float64, highestPrice *float64) ([]*model.Product, error)
 	Product(ctx context.Context, id int) (*model.Product, error)
-	Comments(ctx context.Context, productid int, from *int, count *int) ([]*model.Comment, error)
+	Comments(ctx context.Context, productid int) ([]*model.ExtendedComment, error)
 	Register(ctx context.Context, email string, name string, surname string, gender string, password string) (bool, error)
 	Login(ctx context.Context, email string, password string) (bool, error)
 	CartAdd(ctx context.Context, productid int, count int) (bool, error)
@@ -185,6 +196,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Comment.Userid(childComplexity), true
 
+	case "ExtendedComment.content":
+		if e.complexity.ExtendedComment.Content == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.Content(childComplexity), true
+
+	case "ExtendedComment.date":
+		if e.complexity.ExtendedComment.Date == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.Date(childComplexity), true
+
+	case "ExtendedComment.id":
+		if e.complexity.ExtendedComment.ID == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.ID(childComplexity), true
+
+	case "ExtendedComment.name":
+		if e.complexity.ExtendedComment.Name == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.Name(childComplexity), true
+
+	case "ExtendedComment.productid":
+		if e.complexity.ExtendedComment.Productid == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.Productid(childComplexity), true
+
+	case "ExtendedComment.role":
+		if e.complexity.ExtendedComment.Role == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.Role(childComplexity), true
+
+	case "ExtendedComment.surname":
+		if e.complexity.ExtendedComment.Surname == nil {
+			break
+		}
+
+		return e.complexity.ExtendedComment.Surname(childComplexity), true
+
 	case "Product.description":
 		if e.complexity.Product.Description == nil {
 			break
@@ -226,6 +286,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Product.Price(childComplexity), true
+
+	case "Product.subscriptiontype":
+		if e.complexity.Product.Subscriptiontype == nil {
+			break
+		}
+
+		return e.complexity.Product.Subscriptiontype(childComplexity), true
 
 	case "Query.CartAdd":
 		if e.complexity.Query.CartAdd == nil {
@@ -323,7 +390,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Comments(childComplexity, args["productid"].(int), args["from"].(*int), args["count"].(*int)), true
+		return e.complexity.Query.Comments(childComplexity, args["productid"].(int)), true
 
 	case "Query.History":
 		if e.complexity.Query.History == nil {
@@ -815,24 +882,6 @@ func (ec *executionContext) field_Query_comments_args(ctx context.Context, rawAr
 		}
 	}
 	args["productid"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["from"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["from"] = arg1
-	var arg2 *int
-	if tmp, ok := rawArgs["count"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("count"))
-		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["count"] = arg2
 	return args, nil
 }
 
@@ -1057,6 +1106,8 @@ func (ec *executionContext) fieldContext_CartItem_product(ctx context.Context, f
 				return ec.fieldContext_Product_file(ctx, field)
 			case "price":
 				return ec.fieldContext_Product_price(ctx, field)
+			case "subscriptiontype":
+				return ec.fieldContext_Product_subscriptiontype(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -1318,6 +1369,314 @@ func (ec *executionContext) _Comment_content(ctx context.Context, field graphql.
 func (ec *executionContext) fieldContext_Comment_content(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_id(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_name(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_surname(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_surname(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Surname, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_surname(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_role(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_role(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Role, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_role(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_date(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_date(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_date(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_productid(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_productid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Productid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_productid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ExtendedComment_content(ctx context.Context, field graphql.CollectedField, obj *model.ExtendedComment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ExtendedComment_content(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Content, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ExtendedComment_content(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ExtendedComment",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1592,6 +1951,50 @@ func (ec *executionContext) fieldContext_Product_price(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Product_subscriptiontype(ctx context.Context, field graphql.CollectedField, obj *model.Product) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Product_subscriptiontype(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subscriptiontype, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Product_subscriptiontype(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Product",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_search(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_search(ctx, field)
 	if err != nil {
@@ -1643,6 +2046,8 @@ func (ec *executionContext) fieldContext_Query_search(ctx context.Context, field
 				return ec.fieldContext_Product_file(ctx, field)
 			case "price":
 				return ec.fieldContext_Product_price(ctx, field)
+			case "subscriptiontype":
+				return ec.fieldContext_Product_subscriptiontype(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -1712,6 +2117,8 @@ func (ec *executionContext) fieldContext_Query_product(ctx context.Context, fiel
 				return ec.fieldContext_Product_file(ctx, field)
 			case "price":
 				return ec.fieldContext_Product_price(ctx, field)
+			case "subscriptiontype":
+				return ec.fieldContext_Product_subscriptiontype(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
 		},
@@ -1744,7 +2151,7 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comments(rctx, fc.Args["productid"].(int), fc.Args["from"].(*int), fc.Args["count"].(*int))
+		return ec.resolvers.Query().Comments(rctx, fc.Args["productid"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1756,9 +2163,9 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Comment)
+	res := resTmp.([]*model.ExtendedComment)
 	fc.Result = res
-	return ec.marshalNComment2ᚕᚖGoSoftᚋgraphᚋmodelᚐCommentᚄ(ctx, field.Selections, res)
+	return ec.marshalNExtendedComment2ᚕᚖGoSoftᚋgraphᚋmodelᚐExtendedCommentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1770,17 +2177,21 @@ func (ec *executionContext) fieldContext_Query_comments(ctx context.Context, fie
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Comment_id(ctx, field)
-			case "userid":
-				return ec.fieldContext_Comment_userid(ctx, field)
+				return ec.fieldContext_ExtendedComment_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ExtendedComment_name(ctx, field)
+			case "surname":
+				return ec.fieldContext_ExtendedComment_surname(ctx, field)
+			case "role":
+				return ec.fieldContext_ExtendedComment_role(ctx, field)
 			case "date":
-				return ec.fieldContext_Comment_date(ctx, field)
+				return ec.fieldContext_ExtendedComment_date(ctx, field)
 			case "productid":
-				return ec.fieldContext_Comment_productid(ctx, field)
+				return ec.fieldContext_ExtendedComment_productid(ctx, field)
 			case "content":
-				return ec.fieldContext_Comment_content(ctx, field)
+				return ec.fieldContext_ExtendedComment_content(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Comment", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ExtendedComment", field.Name)
 		},
 	}
 	defer func() {
@@ -4894,7 +5305,7 @@ func (ec *executionContext) unmarshalInputNewProduct(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "photo", "file", "price"}
+	fieldsInOrder := [...]string{"name", "description", "photo", "file", "price", "subscriptiontype"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4946,6 +5357,15 @@ func (ec *executionContext) unmarshalInputNewProduct(ctx context.Context, obj in
 				return it, err
 			}
 			it.Price = data
+		case "subscriptiontype":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subscriptiontype"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subscriptiontype = data
 		}
 	}
 
@@ -5051,6 +5471,76 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var extendedCommentImplementors = []string{"ExtendedComment"}
+
+func (ec *executionContext) _ExtendedComment(ctx context.Context, sel ast.SelectionSet, obj *model.ExtendedComment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, extendedCommentImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ExtendedComment")
+		case "id":
+
+			out.Values[i] = ec._ExtendedComment_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+
+			out.Values[i] = ec._ExtendedComment_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "surname":
+
+			out.Values[i] = ec._ExtendedComment_surname(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "role":
+
+			out.Values[i] = ec._ExtendedComment_role(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "date":
+
+			out.Values[i] = ec._ExtendedComment_date(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "productid":
+
+			out.Values[i] = ec._ExtendedComment_productid(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "content":
+
+			out.Values[i] = ec._ExtendedComment_content(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var productImplementors = []string{"Product"}
 
 func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, obj *model.Product) graphql.Marshaler {
@@ -5099,6 +5589,13 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 		case "price":
 
 			out.Values[i] = ec._Product_price(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "subscriptiontype":
+
+			out.Values[i] = ec._Product_subscriptiontype(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -6004,7 +6501,7 @@ func (ec *executionContext) marshalNCartItem2ᚖGoSoftᚋgraphᚋmodelᚐCartIte
 	return ec._CartItem(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNComment2ᚕᚖGoSoftᚋgraphᚋmodelᚐCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNExtendedComment2ᚕᚖGoSoftᚋgraphᚋmodelᚐExtendedCommentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ExtendedComment) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -6028,7 +6525,7 @@ func (ec *executionContext) marshalNComment2ᚕᚖGoSoftᚋgraphᚋmodelᚐComme
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNComment2ᚖGoSoftᚋgraphᚋmodelᚐComment(ctx, sel, v[i])
+			ret[i] = ec.marshalNExtendedComment2ᚖGoSoftᚋgraphᚋmodelᚐExtendedComment(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -6048,14 +6545,14 @@ func (ec *executionContext) marshalNComment2ᚕᚖGoSoftᚋgraphᚋmodelᚐComme
 	return ret
 }
 
-func (ec *executionContext) marshalNComment2ᚖGoSoftᚋgraphᚋmodelᚐComment(ctx context.Context, sel ast.SelectionSet, v *model.Comment) graphql.Marshaler {
+func (ec *executionContext) marshalNExtendedComment2ᚖGoSoftᚋgraphᚋmodelᚐExtendedComment(ctx context.Context, sel ast.SelectionSet, v *model.ExtendedComment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Comment(ctx, sel, v)
+	return ec._ExtendedComment(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
@@ -6545,22 +7042,6 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	}
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
-	return res
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

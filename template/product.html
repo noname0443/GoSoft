@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head.html" }}
+    <link rel="stylesheet" href="/assets/product.css">
+    <script src="/assets/product.js"></script>
+</head>
+{{ template "header.html" }}
+<body>
+<main>
+    <section class="product-section">
+        <h1>{{ .product.Name }}</h1>
+        <div class="product">
+            <div class="product-image">
+                <img src="{{ .product.Photo }}" alt="Product Image">
+            </div>
+            <div class="product-details">
+                <div class="product-price">${{.product.Price}}/month</div>
+                <button class="buy-button">Buy Now</button>
+            </div>
+        </div>
+
+        <div class="product">
+            <div>
+                <h2>Product Benefits</h2>
+                <p class="product-description">{{ .product.Description }}</p>
+            </div>
+        </div>
+
+        <div class="product">
+            <div>
+                <h2>Frequently Asked Questions</h2>
+                <ul>
+                    <li>
+                        <div class="question">
+                            <h3>What payment methods do you accept?</h3>
+                            <p>We accept all major credit cards, as well as PayPal and bank transfers.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="question">
+                            <h3>Can I cancel my subscription at any time?</h3>
+                            <p>Yes, you can cancel your subscription at any time. Your subscription will remain active until the end of the current billing cycle.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="product" style="display: block">
+            <h2>Comments</h2>
+            <div style="margin: 0 auto">
+                {{if .loggedin}}
+                <div class="comments">
+                    <h3>Your comment</h3>
+                    <form id="comment-form" onsubmit="return false;">
+                        <textarea id="comment" name="comment" required></textarea><br>
+                        <button type="submit" onclick="submitComment()">Submit</button>
+                    </form>
+                </div>
+                {{ end }}
+                {{range .comments}}
+                <div class="comment-block" id="comment-list">
+                    <div class="comment-meta">
+                        <span class="comment-author">{{.Name}} {{.Surname}}</span>
+                        <span class="comment-date">{{.Date}}</span>
+                    </div>
+                    <div class="comment-content">
+                        <p>{{.Content}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </section>
+</main>
+{{ template "footer.html" }}
+</body>
+</html>

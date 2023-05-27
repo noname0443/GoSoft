@@ -5,53 +5,41 @@ body {
     padding: 0;
 }
 
-.navbar {
-    display: flex;
-    align-items: center;
+p { line-height: 1.35; }
+
+/* Apply styles to the form element */
+.search-form {
+    display: inline-block;
+    width: 100%;
 }
 
-.nav-button {
-    background-color: #fff;
-    color: #333;
-    border-radius: 5px;
+/* Apply styles to the input element */
+.search-input {
+    display: inline-block;
+    width: 80%;
+    box-sizing: border-box;
+    padding: 8px;
+    height: 100%;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Apply styles to the button element */
+.search-button {
+    display: inline-block;
+    width: 15%;
+    height: 100%;
+    background-color: #fdfdfd;
+    color: white;
+    padding: 8px;
     border: none;
-    padding: 5px 10px;
-    margin-right: 10px;
+    border-radius: 4px;
     cursor: pointer;
 }
 
-.nav-button:hover {
-    background-color: #f1f1f1;
-}
-
-
-/* Header styles */
-header {
-    background-color: #333;
-    color: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-}
-
-header h1 {
-    margin: 0;
-}
-
-header input[type="text"] {
-    padding: 5px;
-    border-radius: 5px;
-    border: none;
-}
-
-header button[type="submit"] {
-    background-color: #fff;
-    color: #333;
-    border-radius: 5px;
-    border: none;
-    padding: 5px 10px;
-    margin-left: 10px;
+/* Apply styles to the button element on hover */
+.search-button:hover {
+    background-color: #ffffff;
 }
 
 /* Container styles */
@@ -62,7 +50,7 @@ header button[type="submit"] {
 
 /* Filters sidebar styles */
 .filters {
-    background-color: #f1f1f1;
+    background-color: #ffffff;
     padding: 20px;
     width: 100%;
     box-sizing: border-box;
@@ -88,6 +76,7 @@ header button[type="submit"] {
 .filter-group input[type="number"],
 .filter-group select,
 .filter-group input[type="text"] {
+    background-color: #f5f5f5;
     padding: 5px;
     border-radius: 5px;
     border: none;
@@ -96,13 +85,19 @@ header button[type="submit"] {
 }
 
 button[type="submit"] {
-    background-color: #333;
+    background-color: #1E90FF;
     color: #fff;
     border-radius: 5px;
     border: none;
     padding: 5px 10px;
     margin-top: 10px;
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #fff;
+    color: #1E90FF;
+    border: 1px solid#1E90FF;
 }
 
 /* Product list styles */
@@ -125,7 +120,7 @@ main {
     margin-bottom: 20px;
     background-color: #fff;
     border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 44, 255, 0.2);
     width: calc(33.33% - 20px);
     box-sizing: border-box;
     display: flex;
@@ -156,7 +151,7 @@ main {
 }
 
 .add-to-cart {
-    background-color: #333;
+    background-color: #1E90FF;
     color: #fff;
     border-radius: 5px;
     border: none;
@@ -167,7 +162,9 @@ main {
 }
 
 .add-to-cart:hover {
-    background-color: #555;
+    background-color: #fff;
+    color: #1E90FF;
+    border: 1px solid#1E90FF;
 }
 
 /* Media queries */

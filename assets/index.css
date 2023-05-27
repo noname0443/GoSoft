@@ -8,6 +8,7 @@ body {
     padding: 0;
 }
 
+
 .header {
     background-color: #1E90FF;
     color: #fff;
@@ -40,9 +41,32 @@ nav ul li a {
 }
 
 .hero {
-    background-image: url("hero-bg.jpg");
-    background-size: cover;
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 75vh;
+    background-image: url("main.jpg");
+    background-repeat: no-repeat;
     background-position: center;
+    background-size: cover;
+}
+
+.hero:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+}
+
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
     color: #fff;
     padding: 100px 0;
@@ -116,6 +140,8 @@ nav ul li a {
 }
 
 .contact-us {
+    max-width: 1080px;
+    margin: 0 auto;
     padding: 50px;
 }
 

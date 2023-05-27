@@ -21,21 +21,33 @@ type Comment struct {
 	Content   string `json:"content"`
 }
 
+type ExtendedComment struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Surname   string `json:"surname"`
+	Role      string `json:"role"`
+	Date      string `json:"date"`
+	Productid string `json:"productid"`
+	Content   string `json:"content"`
+}
+
 type NewProduct struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Photo       string  `json:"photo"`
-	File        string  `json:"file"`
-	Price       float64 `json:"price"`
+	Name             string  `json:"name"`
+	Description      string  `json:"description"`
+	Photo            string  `json:"photo"`
+	File             string  `json:"file"`
+	Price            float64 `json:"price"`
+	Subscriptiontype string  `json:"subscriptiontype"`
 }
 
 type Product struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Photo       string  `json:"photo"`
-	File        string  `json:"file"`
-	Price       float64 `json:"price"`
+	ID               string  `json:"id"`
+	Name             string  `json:"name"`
+	Description      string  `json:"description"`
+	Photo            string  `json:"photo"`
+	File             string  `json:"file"`
+	Price            float64 `json:"price"`
+	Subscriptiontype string  `json:"subscriptiontype"`
 }
 
 type User struct {

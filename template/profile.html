@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{ template "head.html" }}
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/assets/profile.css" />
+    <link rel="stylesheet" href="/assets/store.css" />
+</head>
+<body>
+{{ template "header.html" }}
+<div class="container">
+    <h1 style="margin: 0 auto;">User Profile</h1>
+    <table id="user-profile">
+        <tr>
+            <th>User ID</th>
+            <td id="user-id"></td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td id="user-email"></td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td id="user-name"></td>
+        </tr>
+        <tr>
+            <th>Surname</th>
+            <td id="user-surname"></td>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <td id="user-password"></td>
+        </tr>
+        <tr>
+            <th>Gender</th>
+            <td id="user-gender"></td>
+        </tr>
+        <tr>
+            <th>Token</th>
+            <td id="user-token"></td>
+        </tr>
+        <tr>
+            <th>Token Date</th>
+            <td id="user-token-date"></td>
+        </tr>
+        <tr>
+            <th>Registration Date</th>
+            <td id="user-registration-date"></td>
+        </tr>
+        <tr>
+            <th>Role</th>
+            <td id="user-role"></td>
+        </tr>
+    </table>
+</div>
+<div class="containerPurchased">
+    <h2 style="text-align: center; padding-bottom: 20px">Purchased</h2>
+    <ul class="product-list">
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 1</h3>
+                <p>Description of Product 1</p>
+                <p class="product-price">Price: $10.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 2</h3>
+                <p>Description of Product 2</p>
+                <p class="product-price">Price: $20.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+    </ul>
+    <ul class="product-list">
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 1</h3>
+                <p>Description of Product 1</p>
+                <p class="product-price">Price: $10.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 2</h3>
+                <p>Description of Product 2</p>
+                <p class="product-price">Price: $20.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+        <li class="product-item">
+            <div class="product-info">
+                <h3>Product 3</h3>
+                <p>Description of Product 3</p>
+                <p class="product-price">Price: $30.00</p>
+            </div>
+            <button class="add-to-cart">Add to Cart</button>
+        </li>
+    </ul>
+</div>
+{{ template "footer.html" }}
+<script src="../assets/profile.js"></script>
+</body>
+</html>

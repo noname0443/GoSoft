@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS Store (
                                      Description TEXT NOT NULL,
                                      Photo TEXT NOT NULL,
                                      File TEXT NOT NULL,
-                                     Price REAL NOT NULL
+                                     Price REAL NOT NULL,
+                                     SubscriptionType TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CART (
@@ -45,7 +46,10 @@ CREATE TABLE IF NOT EXISTS Purchase (
                                         ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE,
                                         UserDescription TEXT,
                                         Price REAL NOT NULL,
-                                        OrderID INTEGER NOT NULL
+                                        OrderID SERIAL NOT NULL,
+                                        Paid BOOLEAN NOT NULL,
+                                        Count INTEGER NOT NULL,
+                                        SubscriptionType TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Comment (

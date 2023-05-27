@@ -20,6 +20,7 @@ type Product {
     photo: String!
     file: String!
     price: Float!
+    subscriptiontype: String!
 }
 
 type CartItem {
@@ -35,18 +36,29 @@ type Comment {
     content: String!
 }
 
+type ExtendedComment {
+    id: ID!
+    name: String!
+    surname: String!
+    role: String!
+    date: String!
+    productid: ID!
+    content: String!
+}
+
 input NewProduct {
     name: String!
     description: String!
     photo: String!
     file: String!
     price: Float!
+    subscriptiontype: String!
 }
 
 type Query {
     search(name: String, categories: String, lower_price: Float, highest_price: Float): [Product!]!
     product(id: Int!): Product!
-    comments(productid: Int!, from: Int, count: Int): [Comment!]!
+    comments(productid: Int!): [ExtendedComment!]!
 
     register(email: String!, name: String!, surname: String!, gender: String!, password: String!): Boolean!
     login(email: String!, password: String!): Boolean!

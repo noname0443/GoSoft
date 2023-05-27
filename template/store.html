@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{ template "head.html" }}
+    <link rel="stylesheet" href="../assets/store.css">
+</head>
+{{ template "header.html" }}
+<body>
+<div class="container" style="">
+    <div class="filters">
+        <h2>Filters</h2>
+        <form>
+            <div class="filter-group">
+                <label for="lower-price">Lower Price:</label>
+                <input type="number" id="lower-price" name="lower-price" min="0" value="0">
+            </div>
+            <div class="filter-group">
+                <label for="highest-price">Highest Price:</label>
+                <input type="number" id="highest-price" name="highest-price" min="0" value="1e32">
+            </div>
+            <div class="filter-group">
+                <label for="category">Category:</label>
+                <select id="category" name="category">
+                    <option value=""></option>
+                    <option value="backups">Backups</option>
+                    <option value="security">Security</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    <main>
+        <form class="search-form" onsubmit="return false;">
+            <input class="search-input" type="text" name="search-input" placeholder="Search...">
+            <button class="search-button" type="submit" onclick="getProducts()">Search</button>
+        </form>
+        <h2>Products</h2>
+        <ul class="product-list">
+
+        </ul>
+    </main>
+</div>
+<script src="../assets/store.js"></script>
+{{ template "footer.html" }}
+</body>
+</html>

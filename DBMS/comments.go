@@ -6,16 +6,20 @@ import (
 	"time"
 )
 
-func GetComments(productid int, from int, count int) ([]*model.Comment, error) {
+func GetComments(productid int) ([]*model.ExtendedComment, error) {
 	checkConnection()
-	rows, err := PostgreSQL.Query(`SELECT * FROM comment WHERE productid = $1 ORDER BY date LIMIT $2 OFFSET $3`, productid, count, from)
+	rows, err := PostgreSQL.Query(`
+SELECT commentid, users.name, users.surname, users.role, date, productid, content
+	FROM public.comment INNER JOIN users ON users.userid = comment.userid WHERE productid = $1;
+`,
+		productid)
 	if err != nil {
 		return nil, err
 	}
-	var comments []*model.Comment
+	var comments []*model.ExtendedComment
 	for rows.Next() {
-		c := new(model.Comment)
-		err := rows.Scan(&c.ID, &c.Date, &c.Userid, &c.Productid, &c.Content)
+		c := new(model.ExtendedComment)
+		err := rows.Scan(&c.ID, &c.Name, &c.Surname, &c.Role, &c.Date, &c.Productid, &c.Content)
 		if err != nil {
 			return nil, err
 		}
