@@ -77,3 +77,4 @@ CREATE TABLE IF NOT EXISTS Comment (
                                        ProductID INTEGER REFERENCES Store(ProductID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL,
                                        Content TEXT NOT NULL
 );
+

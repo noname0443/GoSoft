@@ -7,7 +7,7 @@ import (
 )
 
 func CartGet(token string) ([]*model.CartItem, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`
 SELECT cart.productid, name, description, photo, file, price, subscriptiontype, count
 FROM public.cart INNER JOIN store ON store.productid = cart.productid
@@ -35,7 +35,7 @@ func CartAdd(token string, productid int, count int) error {
 	if count <= 0 {
 		return errors.New("count less or equal then zero")
 	}
-	checkConnection()
+	CheckConnection()
 	err := removeOldSoftware()
 	if err != nil {
 		return err
@@ -59,7 +59,7 @@ ON CONFLICT (userid, productid) DO UPDATE SET count = cart.count + $2;
 }
 
 func CartRemove(token string, productid int, count int) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 UPDATE cart SET count = count - $3 WHERE productid = $2 AND userid = (SELECT userid FROM users WHERE token = $1);`, token, productid, count)
 	affected, err := result.RowsAffected()
@@ -77,7 +77,7 @@ UPDATE cart SET count = count - $3 WHERE productid = $2 AND userid = (SELECT use
 }
 
 func CartGetItem(token string, productid int) (*model.CartItem, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`
 SELECT cart.productid, name, description, photo, file, price, subscriptiontype, company, count
 FROM public.cart INNER JOIN store ON store.productid = cart.productid
@@ -100,7 +100,7 @@ FROM public.cart INNER JOIN store ON store.productid = cart.productid
 }
 
 func CartPurchase(token string, orderID string) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 INSERT INTO purchase (productid, userid, datetime, subscriptiontype, price, count, paid, orderid)
 	(SELECT productid, userid, $2, (SELECT subscriptiontype FROM store WHERE cart.productid = productid),
@@ -129,7 +129,7 @@ DELETE FROM cart WHERE userid = (SELECT userid FROM users WHERE token = $1);`, t
 }
 
 func PurchasedSoftware(token string) ([]*model.Purchase, error) {
-	checkConnection()
+	CheckConnection()
 	err := removeOldSoftware()
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ ON purchase.productid = store.productid WHERE userid = (SELECT userid FROM users
 }
 
 func CartMakePaid(token string, orderID string) error {
-	checkConnection()
+	CheckConnection()
 	_, err := PostgreSQL.Exec(`
 UPDATE purchase
 	SET paid=TRUE
@@ -169,7 +169,7 @@ UPDATE purchase
 }
 
 func removeOldSoftware() error {
-	checkConnection()
+	CheckConnection()
 	_, err := PostgreSQL.Query(`
 DELETE FROM purchase
 WHERE (now() > (datetime + INTERVAL '1 month' * count) AND subscriptiontype = 'month')
@@ -181,7 +181,7 @@ OR (now() > (datetime + INTERVAL '1 year' * count) AND subscriptiontype = 'year'
 }
 
 func CheckFilePermission(filepath string, token string) (bool, error) {
-	checkConnection()
+	CheckConnection()
 	err := removeOldSoftware()
 	if err != nil {
 		return false, err

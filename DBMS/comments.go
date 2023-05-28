@@ -7,7 +7,7 @@ import (
 )
 
 func GetComments(productid int) ([]*model.ExtendedComment, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`
 SELECT commentid, users.name, users.surname, users.role, date, productid, content
 	FROM public.comment INNER JOIN users ON users.userid = comment.userid WHERE productid = $1 ORDER BY DATE DESC;
@@ -32,7 +32,7 @@ SELECT commentid, users.name, users.surname, users.role, date, productid, conten
 }
 
 func AddComment(token string, productid int, content string) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 INSERT INTO comment(
 	date, userid, productid, content)
@@ -51,7 +51,7 @@ INSERT INTO comment(
 }
 
 func RemoveComment(token string, commentid int) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 DELETE FROM comment
 WHERE userid = (SELECT userid FROM users WHERE token = $1)
@@ -70,7 +70,7 @@ AND commentid = $2;`, token, commentid)
 }
 
 func UpdateComment(token string, commentid int, content string) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 UPDATE comment SET content = $1
 WHERE userid = (SELECT userid FROM users WHERE token = $2)

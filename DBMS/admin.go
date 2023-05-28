@@ -6,7 +6,7 @@ import (
 )
 
 func StoreAdd(product model.NewProduct) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 INSERT INTO public.store(
 	name, description, photo, file, price, subscriptiontype, company)
@@ -25,7 +25,7 @@ INSERT INTO public.store(
 }
 
 func StoreRemove(productid int) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 DELETE FROM store
 WHERE productid = $1;`, productid)
@@ -43,7 +43,7 @@ WHERE productid = $1;`, productid)
 }
 
 func StoreUpdate(productid int, product model.NewProduct) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 UPDATE store
 	SET name=$1, description=$2, photo=$3, file=$4, price=$5, company=$6

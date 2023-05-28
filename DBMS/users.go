@@ -18,7 +18,7 @@ func GenerateToken(password string) string {
 }
 
 func ValidateToken(token string) bool {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`SELECT tokendate FROM users WHERE token = $1`, token)
 	if err != nil {
 		return false
@@ -38,7 +38,7 @@ func ValidateToken(token string) bool {
 }
 
 func ValidatePrivileges(token string, role string) bool {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`SELECT tokendate FROM users WHERE token = $1 AND role = $2`, token, role)
 	if err != nil {
 		return false
@@ -58,7 +58,7 @@ func ValidatePrivileges(token string, role string) bool {
 }
 
 func RegisterCustomer(email string, name string, surname string, gender string, password string) (string, error) {
-	checkConnection()
+	CheckConnection()
 	encpassword := SHA1(password)
 	token := GenerateToken(password)
 	result, err := PostgreSQL.Exec(`
@@ -78,7 +78,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`, email, name, surname, encpassword
 }
 
 func LoginCustomer(email string, password string) (string, error) {
-	checkConnection()
+	CheckConnection()
 
 	rows, err := PostgreSQL.Query(`SELECT * FROM users WHERE email = $1 AND password = $2`, email, SHA1(password))
 	if err != nil {
@@ -104,7 +104,7 @@ func LoginCustomer(email string, password string) (string, error) {
 }
 
 func CheckUsersProduct(email string, password string, productid int) (bool, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`
 SELECT userid, datetime, productid, price, orderid, paid, count, subscriptiontype
 	FROM public.purchase
@@ -121,7 +121,7 @@ SELECT userid, datetime, productid, price, orderid, paid, count, subscriptiontyp
 }
 
 func GetProfile(token string) (*model.User, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`SELECT userid, email, name, surname, gender, registrationdate, role FROM users WHERE token = $1`, token)
 	if err != nil {
 		return nil, err
@@ -141,7 +141,7 @@ func GetProfile(token string) (*model.User, error) {
 }
 
 func UpdateProfile(token string, email string, name string, surname string, gender string, password string) error {
-	checkConnection()
+	CheckConnection()
 	result, err := PostgreSQL.Exec(`
 UPDATE users 
 SET 

@@ -7,7 +7,7 @@ import (
 )
 
 func SearchProducts(name string, preparedCategory string, lowerPrice float64, highestPrice float64) ([]*model.Product, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`
 SELECT store.productid, name, description, photo, file, price, subscriptiontype, company FROM public.store
 WHERE (LENGTH($4) = 0 OR productid in
@@ -31,7 +31,7 @@ WHERE (LENGTH($4) = 0 OR productid in
 }
 
 func GetProduct(id int) (*model.Product, error) {
-	checkConnection()
+	CheckConnection()
 	rows, err := PostgreSQL.Query(`SELECT * FROM store WHERE productid = $1`, id)
 	if err != nil {
 		return nil, err

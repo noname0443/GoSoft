@@ -2,6 +2,7 @@ package main
 
 import (
 	"GoSoft/DBMS"
+	"GoSoft/Utility"
 	"GoSoft/graph"
 	"context"
 	"github.com/gin-gonic/gin"
@@ -105,7 +106,7 @@ func main() {
 		filepath := c.Param("file")
 		token, err := c.Cookie("GoSoftToken")
 		if err != nil {
-			c.AbortWithStatus(400)
+			c.HTML(http.StatusOK, "register.html", gin.H{})
 			return
 		}
 		permission, err := DBMS.CheckFilePermission(filepath, token)
@@ -136,7 +137,10 @@ func main() {
 			}
 			token, err := c.Cookie("GoSoftToken")
 			if err != nil {
-				c.AbortWithStatus(400)
+				c.HTML(http.StatusOK, "product.html", gin.H{
+					"product":  product,
+					"comments": comments,
+				})
 				return
 			}
 			c.HTML(http.StatusOK, "product.html", gin.H{
@@ -144,12 +148,13 @@ func main() {
 				"comments": comments,
 				"loggedin": DBMS.ValidateToken(token),
 			})
+			return
 		}
 	})
 	router.GET("/admin", func(c *gin.Context) {
 		token, err := c.Cookie("GoSoftToken")
 		if err != nil {
-			c.AbortWithStatus(400)
+			c.AbortWithStatus(403)
 			return
 		}
 		if DBMS.ValidatePrivileges(token, "admin") {
@@ -169,7 +174,7 @@ func main() {
 	router.GET("/cart", func(c *gin.Context) {
 		token, err := c.Cookie("GoSoftToken")
 		if err != nil {
-			c.AbortWithStatus(400)
+			c.HTML(http.StatusOK, "register.html", gin.H{})
 			return
 		}
 		if DBMS.ValidateToken(token) {
@@ -281,5 +286,9 @@ func main() {
 
 		c.Status(200)
 	})
-	router.Run()
+	err, m := Utility.GetConfig("config.ini")
+	if err != nil {
+		return
+	}
+	router.Run(m["address"])
 }

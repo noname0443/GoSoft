@@ -9,7 +9,7 @@ import (
 
 var PostgreSQL *sql.DB
 
-func checkConnection() {
+func CheckConnection() {
 	var err error
 	var configs map[string]string
 
