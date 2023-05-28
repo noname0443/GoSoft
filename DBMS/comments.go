@@ -28,6 +28,10 @@ SELECT commentid, users.name, users.surname, users.role, date, productid, conten
 	if err != nil {
 		return nil, err
 	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
+	}
 	return comments, nil
 }
 

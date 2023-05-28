@@ -31,6 +31,10 @@ func ValidateToken(token string) bool {
 	if err != nil {
 		return false
 	}
+	err = rows.Close()
+	if err != nil {
+		return false
+	}
 	if time.Since(date) > (time.Hour * 72) {
 		return false
 	}
@@ -48,6 +52,10 @@ func ValidatePrivileges(token string, role string) bool {
 	}
 	var date time.Time
 	err = rows.Scan(&date)
+	if err != nil {
+		return false
+	}
+	err = rows.Close()
 	if err != nil {
 		return false
 	}
@@ -87,6 +95,10 @@ func LoginCustomer(email string, password string) (string, error) {
 	if !rows.Next() {
 		return "", nil
 	}
+	err = rows.Close()
+	if err != nil {
+		return "", nil
+	}
 
 	token := GenerateToken(password)
 	result, err := PostgreSQL.Exec(`UPDATE users SET token = $1, tokendate =  $2 WHERE email = $3 AND password = $4`, token, time.Now(), email, SHA1(password))
@@ -117,6 +129,10 @@ SELECT userid, datetime, productid, price, orderid, paid, count, subscriptiontyp
 	if !rows.Next() {
 		return false, nil
 	}
+	err = rows.Close()
+	if err != nil {
+		return false, nil
+	}
 	return true, nil
 }
 
@@ -136,6 +152,10 @@ func GetProfile(token string) (*model.User, error) {
 		}
 	} else {
 		return nil, errors.New("user not found")
+	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
 	}
 	return user, nil
 }

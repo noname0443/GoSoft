@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 )
 
 var PostgreSQL *sql.DB
@@ -24,6 +25,9 @@ func CheckConnection() {
 		}
 		DBMSString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s", configs["user"], configs["password"], configs["dbname"], configs["sslmode"])
 		PostgreSQL, err = sql.Open("postgres", DBMSString)
+		PostgreSQL.SetMaxOpenConns(30)
+		PostgreSQL.SetConnMaxIdleTime(time.Second * 3)
+		PostgreSQL.SetMaxIdleConns(30)
 		if err != nil {
 			log.Fatal(err)
 		}

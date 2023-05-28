@@ -27,6 +27,10 @@ WHERE (LENGTH($4) = 0 OR productid in
 		}
 		products = append(products, p)
 	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
+	}
 	return products, nil
 }
 
@@ -43,6 +47,10 @@ func GetProduct(id int) (*model.Product, error) {
 	err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.Photo, &p.File, &p.Price, &p.Subscriptiontype, &p.Company)
 	if err != nil {
 		return nil, err
+	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
 	}
 	return p, nil
 }

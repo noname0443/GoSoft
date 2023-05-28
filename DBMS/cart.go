@@ -28,6 +28,10 @@ FROM public.cart INNER JOIN store ON store.productid = cart.productid
 		}
 		cart = append(cart, p)
 	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
+	}
 	return cart, nil
 }
 
@@ -45,7 +49,7 @@ func CartAdd(token string, productid int, count int) error {
 		return errors.New("software already bought")
 	}
 
-	_, err = PostgreSQL.Query(`
+	_, err = PostgreSQL.Exec(`
 INSERT INTO cart (userid, productid, count)
 SELECT userid, $1, $2
 FROM users 
@@ -95,6 +99,10 @@ FROM public.cart INNER JOIN store ON store.productid = cart.productid
 		if err != nil {
 			return nil, err
 		}
+	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
 	}
 	return p, nil
 }
@@ -152,6 +160,10 @@ ON purchase.productid = store.productid WHERE userid = (SELECT userid FROM users
 		}
 		products = append(products, item)
 	}
+	err = rows.Close()
+	if err != nil {
+		return nil, nil
+	}
 	return products, nil
 }
 
@@ -170,7 +182,7 @@ UPDATE purchase
 
 func removeOldSoftware() error {
 	CheckConnection()
-	_, err := PostgreSQL.Query(`
+	_, err := PostgreSQL.Exec(`
 DELETE FROM purchase
 WHERE (now() > (datetime + INTERVAL '1 month' * count) AND subscriptiontype = 'month')
 OR (now() > (datetime + INTERVAL '1 year' * count) AND subscriptiontype = 'year');`)
@@ -196,6 +208,10 @@ SELECT productid FROM store
 	}
 	if !rows.Next() {
 		return false, err
+	}
+	err = rows.Close()
+	if err != nil {
+		return false, nil
 	}
 	return true, nil
 }
