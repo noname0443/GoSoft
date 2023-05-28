@@ -131,6 +131,26 @@ func main() {
 			})
 		}
 	})
+	router.GET("/admin", func(c *gin.Context) {
+		token, err := c.Cookie("GoSoftToken")
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+		if DBMS.ValidatePrivileges(token, "admin") {
+			products, err := DBMS.SearchProducts("", "", 0, 1e32)
+			if err != nil {
+				return
+			}
+			c.HTML(http.StatusOK, "admin.html", gin.H{
+				"products": products,
+			})
+			return
+		} else {
+			c.AbortWithStatus(403)
+			return
+		}
+	})
 	router.GET("/cart", func(c *gin.Context) {
 		token, err := c.Cookie("GoSoftToken")
 		if err != nil {

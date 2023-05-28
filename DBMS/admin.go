@@ -9,8 +9,8 @@ func StoreAdd(product model.NewProduct) error {
 	checkConnection()
 	result, err := PostgreSQL.Exec(`
 INSERT INTO public.store(
-	name, description, photo, file, price)
-	VALUES ($1, $2, $3, $4, $5);`, product.Name, product.Description, product.Photo, product.File, product.Price)
+	name, description, photo, file, price, subscriptiontype)
+	VALUES ($1, $2, $3, $4, $5, $6);`, product.Name, product.Description, product.Photo, product.File, product.Price, product.Subscriptiontype)
 	if err != nil {
 		return err
 	}
