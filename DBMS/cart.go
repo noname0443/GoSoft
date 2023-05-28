@@ -40,7 +40,7 @@ func CartAdd(token string, productid int, count int) error {
 	if err != nil {
 		return err
 	}
-	rows, err := PostgreSQL.Query(`SELECT * FROM purchase WHERE userid = (SELECT userid FROM users WHERE token = $1) AND productid = $2`, token, productid)
+	rows, err := PostgreSQL.Query(`SELECT * FROM purchase WHERE userid = (SELECT userid FROM users WHERE token = $1) AND productid = $2 AND paid = true;`, token, productid)
 	if rows.Next() {
 		return errors.New("software already bought")
 	}

@@ -29,32 +29,28 @@ function getProducts() {
             console.log(data)
             let product_list = document.getElementsByClassName('product-list')[0];
             let array = data['data']['search'];
-            let maxLength = 100;
             for(let i = 0; i < array.length; i++){
                 product_list.innerHTML += `
         <li class="product-item" itemid="${array[i]['id']}">
-             <div class="product-info" style="display: flex; height: 200px">
-                 <div style="width: 50%">
-                    <img src="${array[i]['photo']}" style="height: 100%; margin: 0 auto">
-                 </div>
-                 <div style="width: 50%" id="text">
+             <div class="box" >
+                 <img src="${array[i]['photo']}">
+                 <div id="text">
                     <h3>${array[i]['name']}</h3>
-                    <p>${array[i]['description'].substr(0, maxLength) + "..."}</p>
-                    <p class="product-price">Price: ${array[i]['price']}/${array[i]['subscriptiontype']}</p>
+                    <p class="product-price">Price: $${array[i]['price']}/${array[i]['subscriptiontype']}</p>
                     <p>${array[i]['company']}</p>
                  </div>
              </div>
              <a class="add-to-cart" href="/store/${array[i]['id']}">Check Software</a>
         </li>
     `
-                let textBox = product_list.querySelectorAll('[itemid]')[i].querySelector('div').querySelector('[id]').querySelector('p');
+                /*let textBox = product_list.querySelectorAll('[itemid]')[i].querySelector('div').querySelector('[id]').querySelector('p');
                 var textBoxWidth = textBox.clientWidth;
                 var textBoxPadding = parseInt(getComputedStyle(textBox).paddingLeft) + parseInt(getComputedStyle(textBox).paddingRight);
                 var fontSize = parseInt(getComputedStyle(textBox).fontSize);
                 var lineHeight = parseInt(getComputedStyle(textBox).lineHeight);
                 var textBoxHeight = textBox.clientHeight;
                 var charCount = Math.floor(((textBoxWidth - textBoxPadding) / fontSize) * (textBoxHeight / lineHeight));
-                textBox.innerText = textBox.innerText.substr(0, charCount)
+                textBox.innerText = textBox.innerText.substr(0, charCount)*/
             }
         });
 }

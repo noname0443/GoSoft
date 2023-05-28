@@ -79,7 +79,7 @@ func (r *queryResolver) Register(ctx context.Context, email string, name string,
 	if err != nil || len(token) == 0 {
 		return false, err
 	}
-	gc.SetCookie("GoSoftToken", token, 259200, "", "", true, true)
+	gc.SetCookie("GoSoftToken", token, 259200, "", "", false, true)
 	return true, nil
 }
 
@@ -93,7 +93,7 @@ func (r *queryResolver) Login(ctx context.Context, email string, password string
 	if err != nil || len(token) == 0 {
 		return false, err
 	}
-	gc.SetCookie("GoSoftToken", token, 259200, "", "", true, true)
+	gc.SetCookie("GoSoftToken", token, 259200, "", "", false, true)
 	return true, nil
 }
 

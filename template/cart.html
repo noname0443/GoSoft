@@ -11,36 +11,38 @@
 {{ template "header.html" }}
 <div class="cart-items">
     <h2>Your Cart</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Software</th>
-            <th>Price</th>
-            <th>Duration</th>
-            <th>Subscription Type</th>
-            <th>Remove from cart</th>
-            <th>Subtotal</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{range $key, $value := .cart}}
-        <tr>
-            <td>{{ $value.Product.Name }}</td>
-            <td>${{ $value.Product.Price }}</td>
-            <td>{{ $value.Count }}</td>
-            <td>{{ $value.Product.Subscriptiontype }}</td>
-            <td><button onclick="removeFromCart({{ index $.productids $key }}, {{ $value.Count }})">Delete</button></td>
-            <td>${{ index $.subtotal $key }}</td>
-        </tr>
-        {{end}}
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="5">Total:</td>
-            <td>${{ .sum }}</td>
-        </tr>
-        </tfoot>
-    </table>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+            <tr>
+                <th>Software</th>
+                <th>Price</th>
+                <th>Duration</th>
+                <th>Subscription Type</th>
+                <th>Remove from cart</th>
+                <th>Subtotal</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range $key, $value := .cart}}
+            <tr>
+                <td>{{ $value.Product.Name }}</td>
+                <td>${{ $value.Product.Price }}</td>
+                <td>{{ $value.Count }}</td>
+                <td>{{ $value.Product.Subscriptiontype }}</td>
+                <td><button onclick="removeFromCart({{ index $.productids $key }}, {{ $value.Count }})">Delete</button></td>
+                <td>${{ index $.subtotal $key }}</td>
+            </tr>
+            {{end}}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="5">Total:</td>
+                <td>${{ .sum }}</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
     <script src="https://www.paypal.com/sdk/js?client-id=AYZy3f-tqV9_YZOIavMunW1q4RXxrWVZLaeuHk2sX7BIzS7wHfEB3pLZmZtaqv4bDTM5XysCytmeGaNg&currency=USD"></script>
     <div id="paypal-button-container"></div>
     {{ if gt (len .cart) 0 }}
