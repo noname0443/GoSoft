@@ -25,7 +25,8 @@ query {
 }`
         })
     }).then(r => r.json()).then(data => {
-        window.location.reload();
+        console.log(data)
+        //window.location.reload();
     });
 }
 
@@ -58,6 +59,7 @@ query {
 }`
         })
     }).then(r => r.json()).then(data => {
-        window.location.reload();
+        console.log(data)
+        //window.location.reload();
     });
 }

@@ -298,6 +298,15 @@ func (r *queryResolver) History(ctx context.Context) ([]*model.Purchase, error) 
 	return history, nil
 }
 
+// IsBought is the resolver for the isBought field.
+func (r *queryResolver) IsBought(ctx context.Context, email string, password string, productid int) (bool, error) {
+	result, err := DBMS.CheckUsersProduct(email, password, productid)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
+}
+
 // CommentAdd is the resolver for the CommentAdd field.
 func (r *queryResolver) CommentAdd(ctx context.Context, content string, productid int) (bool, error) {
 	gc, err := Utility.GinContextFromContext(ctx)

@@ -20,7 +20,7 @@ function getProducts() {
                 highest_price: ${parseFloat(document.getElementsByName('highest-price')[0].value)},
                 categories: \"${document.getElementsByName('category')[0].value}\"
             )
-            { id, name, photo, price, description, subscriptiontype } }`
+            { id, name, photo, price, description, subscriptiontype, company } }`
         })
     })
         .then(r => r.json())
@@ -29,7 +29,7 @@ function getProducts() {
             console.log(data)
             let product_list = document.getElementsByClassName('product-list')[0];
             let array = data['data']['search'];
-            let maxLength = 200;
+            let maxLength = 100;
             for(let i = 0; i < array.length; i++){
                 product_list.innerHTML += `
         <li class="product-item" itemid="${array[i]['id']}">
@@ -41,6 +41,7 @@ function getProducts() {
                     <h3>${array[i]['name']}</h3>
                     <p>${array[i]['description'].substr(0, maxLength) + "..."}</p>
                     <p class="product-price">Price: ${array[i]['price']}/${array[i]['subscriptiontype']}</p>
+                    <p>${array[i]['company']}</p>
                  </div>
              </div>
              <a class="add-to-cart" href="/store/${array[i]['id']}">Check Software</a>

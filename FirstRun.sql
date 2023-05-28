@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS Store (
                                      Photo TEXT NOT NULL,
                                      File TEXT NOT NULL,
                                      Price REAL NOT NULL,
-                                     SubscriptionType TEXT NOT NULL
+                                     SubscriptionType TEXT NOT NULL,
+                                     Company TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CART (

@@ -1,21 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {{ template "head.html" }}
     <title>Admin Page</title>
     <link rel="stylesheet" href="/assets/admin.css" />
-    {{ template "head.html" }}
 </head>
 <body>
 {{ template "header.html" }}
-<!-- <div class="inside">
-    <nav>
-        <ul>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">Orders</a></li>
-            <li><a href="#">Customers</a></li>
-        </ul>
-    </nav> // For future
-</div> -->
 <div id="overlay">
     <div id="overlay-content">
         <h2>Edit Product Information</h2>
@@ -32,15 +23,17 @@
             <input type="text" id="product-price" name="product-price"><br><br>
             <label for="product-subscriptiontype">Subscription Type:</label>
             <input type="text" id="product-subscriptiontype" name="product-subscriptiontype"><br><br>
-            <div style="display: block">
-                <button type="submit" id="accept-edit" onclick="updateProduct(this.getAttribute('editid'))" editid="">Save Changes</button>
-                <button type="submit" onclick="overlay.style.display = 'none';">Close</button>
-            </div>
+            <label for="product-company">Company:</label>
+            <input type="text" id="product-company" name="product-company"><br><br>
         </form>
+        <div style="display: block">
+            <button type="submit" id="accept-edit" onclick="updateProduct(this.getAttribute('editid'))" editid="">Save Changes</button>
+            <button type="submit" onclick="overlay.style.display = 'none';">Close</button>
+        </div>
     </div>
 </div>
 <div class="container">
-    <h2>Create Product</h2>
+    <h2 style="text-align: center">Create Product</h2>
     <form onsubmit="false;">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name">
@@ -59,40 +52,48 @@
 
         <label for="subscriptiontype">Subscription Type:</label>
         <input type="text" id="subscriptiontype" name="subscriptiontype">
+
+        <label for="company">Company:</label>
+        <input type="text" id="company" name="company">
     </form>
     <button type="submit" onclick="createProduct();" class="create-button">Create</button>
     <h2>Products</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Photo</th>
-            <th>File</th>
-            <th>Price</th>
-            <th>Subscription Type</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{range .products}}
-        <tr id="{{ .ID }}">
-            <td>{{ .ID }}</td>
-            <td>{{ .Name }}</td>
-            <td>{{ .Description }}</td>
-            <td>{{ .Photo }}</td>
-            <td>{{ .File }}</td>
-            <td>{{ .Price }}</td>
-            <td>{{ .Subscriptiontype }}</td>
-            <td class="actions">
-                <button onclick="displayProduct({{ .ID }})">Edit</button>
-                <button onclick="removeProduct({{ .ID }})">Delete</button>
-            </td>
-        </tr>
-        {{ end }}
-        </tbody>
-    </table>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Photo</th>
+                <th>File</th>
+                <th>Price</th>
+                <th>Subscription Type</th>
+                <th>Company</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .products}}
+            <tr id="{{ .ID }}">
+                <td>{{ .ID }}</td>
+                <td>{{ .Name }}</td>
+                <td>{{ .Description }}</td>
+                <td>{{ .Photo }}</td>
+                <td>{{ .File }}</td>
+                <td>{{ .Price }}</td>
+                <td>{{ .Subscriptiontype }}</td>
+                <td>{{ .Company }}</td>
+                <td class="actions">
+                    <button onclick="displayProduct({{ .ID }})">Edit</button>
+                    <button onclick="removeProduct({{ .ID }})">Delete</button>
+                </td>
+            </tr>
+            {{ end }}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 <script src="/assets/admin.js"></script>
 </body>

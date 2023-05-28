@@ -79,7 +79,7 @@ UPDATE cart SET count = count - $3 WHERE productid = $2 AND userid = (SELECT use
 func CartGetItem(token string, productid int) (*model.CartItem, error) {
 	checkConnection()
 	rows, err := PostgreSQL.Query(`
-SELECT cart.productid, name, description, photo, file, price, subscriptiontype, count
+SELECT cart.productid, name, description, photo, file, price, subscriptiontype, company, count
 FROM public.cart INNER JOIN store ON store.productid = cart.productid
 	WHERE userid = (SELECT userid FROM users
 		WHERE token = $1) AND productid = $2;
@@ -91,7 +91,7 @@ FROM public.cart INNER JOIN store ON store.productid = cart.productid
 	var p *model.CartItem
 	for rows.Next() {
 		p = new(model.CartItem)
-		err := rows.Scan(&p.Product.ID, &p.Product.Name, &p.Product.Description, &p.Product.Photo, &p.Product.File, &p.Product.Price, &p.Product.Subscriptiontype, &p.Count)
+		err := rows.Scan(&p.Product.ID, &p.Product.Name, &p.Product.Description, &p.Product.Photo, &p.Product.File, &p.Product.Price, &p.Product.Subscriptiontype, &p.Product.Company, &p.Count)
 		if err != nil {
 			return nil, err
 		}
@@ -135,7 +135,7 @@ func PurchasedSoftware(token string) ([]*model.Purchase, error) {
 		return nil, err
 	}
 	rows, err := PostgreSQL.Query(`
-SELECT purchase.productid, name, description, photo, file, purchase.price, count, purchase.subscriptiontype, datetime FROM purchase INNER JOIN store
+SELECT purchase.productid, name, description, photo, file, purchase.price, count, purchase.subscriptiontype, company, datetime FROM purchase INNER JOIN store
 ON purchase.productid = store.productid WHERE userid = (SELECT userid FROM users WHERE token = $1) AND paid = TRUE ORDER BY datetime DESC;
 `, token)
 	if err != nil {
@@ -146,7 +146,7 @@ ON purchase.productid = store.productid WHERE userid = (SELECT userid FROM users
 	for rows.Next() {
 		item := new(model.Purchase)
 		item.Product = new(model.Product)
-		err := rows.Scan(&item.Product.ID, &item.Product.Name, &item.Product.Description, &item.Product.Photo, &item.Product.File, &item.Product.Price, &item.Count, &item.Product.Subscriptiontype, &item.Date)
+		err := rows.Scan(&item.Product.ID, &item.Product.Name, &item.Product.Description, &item.Product.Photo, &item.Product.File, &item.Product.Price, &item.Count, &item.Product.Subscriptiontype, &item.Product.Company, &item.Date)
 		if err != nil {
 			return nil, err
 		}
@@ -178,4 +178,24 @@ OR (now() > (datetime + INTERVAL '1 year' * count) AND subscriptiontype = 'year'
 		return err
 	}
 	return nil
+}
+
+func CheckFilePermission(filepath string, token string) (bool, error) {
+	checkConnection()
+	err := removeOldSoftware()
+	if err != nil {
+		return false, err
+	}
+	rows, err := PostgreSQL.Query(`
+SELECT productid FROM store
+	WHERE file = $1 AND productid IN
+		(SELECT productid FROM purchase WHERE userid = 
+			(SELECT userid FROM users WHERE token = $2));`, filepath, token)
+	if err != nil {
+		return false, err
+	}
+	if !rows.Next() {
+		return false, err
+	}
+	return true, nil
 }

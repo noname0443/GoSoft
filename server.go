@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -101,7 +102,21 @@ func main() {
 		}
 	})
 	router.GET("/files/:file", func(c *gin.Context) {
-		// TODO: make file download if product is bought
+		filepath := c.Param("file")
+		token, err := c.Cookie("GoSoftToken")
+		if err != nil {
+			c.AbortWithStatus(400)
+			return
+		}
+		permission, err := DBMS.CheckFilePermission(filepath, token)
+		if err != nil {
+			return
+		}
+		if permission {
+			c.File("./files/" + filepath)
+		} else {
+			c.AbortWithStatus(403)
+		}
 	})
 	router.GET("/store/:id", func(c *gin.Context) {
 		productidString := c.Param("id")
@@ -168,7 +183,7 @@ func main() {
 			for _, v := range cart {
 				price := v.Product.Price * float64(v.Count)
 				sum += price
-				subtotal = append(subtotal, price)
+				subtotal = append(subtotal, math.Round(price*100)/100)
 
 				parseInt, err := strconv.ParseInt(v.Product.ID, 10, 32)
 				if err != nil {
@@ -178,7 +193,7 @@ func main() {
 			}
 			c.HTML(http.StatusOK, "cart.html", gin.H{
 				"cart":       cart,
-				"sum":        sum,
+				"sum":        math.Round(sum*100) / 100,
 				"subtotal":   subtotal,
 				"productids": productids,
 			})
@@ -213,7 +228,7 @@ func main() {
 			[]paypal.PurchaseUnitRequest{{
 				Amount: &paypal.PurchaseUnitAmount{
 					Currency:  "USD",
-					Value:     strconv.FormatFloat(sum, 'f', -1, 64),
+					Value:     strconv.FormatFloat(sum, 'f', 1, 64),
 					Breakdown: nil,
 				},
 			},
@@ -250,8 +265,6 @@ func main() {
 		if err != nil {
 			return
 		}
-		log.Println(getOrder)
-		log.Println(getOrder.Status)
 		if getOrder.Status != "APPROVED" {
 			c.AbortWithStatus(400)
 		}

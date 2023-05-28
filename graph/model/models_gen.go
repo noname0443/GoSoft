@@ -38,6 +38,7 @@ type NewProduct struct {
 	File             string  `json:"file"`
 	Price            float64 `json:"price"`
 	Subscriptiontype string  `json:"subscriptiontype"`
+	Company          string  `json:"company"`
 }
 
 type Product struct {
@@ -48,6 +49,7 @@ type Product struct {
 	File             string  `json:"file"`
 	Price            float64 `json:"price"`
 	Subscriptiontype string  `json:"subscriptiontype"`
+	Company          string  `json:"company"`
 }
 
 type Purchase struct {

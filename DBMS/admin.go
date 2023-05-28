@@ -9,8 +9,8 @@ func StoreAdd(product model.NewProduct) error {
 	checkConnection()
 	result, err := PostgreSQL.Exec(`
 INSERT INTO public.store(
-	name, description, photo, file, price, subscriptiontype)
-	VALUES ($1, $2, $3, $4, $5, $6);`, product.Name, product.Description, product.Photo, product.File, product.Price, product.Subscriptiontype)
+	name, description, photo, file, price, subscriptiontype, company)
+	VALUES ($1, $2, $3, $4, $5, $6, $7);`, product.Name, product.Description, product.Photo, product.File, product.Price, product.Subscriptiontype, product.Company)
 	if err != nil {
 		return err
 	}
@@ -46,8 +46,8 @@ func StoreUpdate(productid int, product model.NewProduct) error {
 	checkConnection()
 	result, err := PostgreSQL.Exec(`
 UPDATE store
-	SET name=$1, description=$2, photo=$3, file=$4, price=$5
-	WHERE productid = $6;`, product.Name, product.Description, product.Photo, product.File, product.Price, productid)
+	SET name=$1, description=$2, photo=$3, file=$4, price=$5, company=$6
+	WHERE productid = $7;`, product.Name, product.Description, product.Photo, product.File, product.Price, product.Company, productid)
 	if err != nil {
 		return err
 	}

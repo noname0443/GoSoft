@@ -29,7 +29,8 @@ function updateProduct(productid){
                     photo: \"${document.getElementsByName('product-photo')[0].value}\",
                     file: \"${document.getElementsByName('product-file')[0].value}\",
                     price: ${parseFloat(document.getElementsByName('product-price')[0].value)},
-                    subscriptiontype: \"${document.getElementsByName('product-subscriptiontype')[0].value}\"
+                    subscriptiontype: \"${document.getElementsByName('product-subscriptiontype')[0].value}\",
+                    company: \"${document.getElementsByName('product-company')[0].value}\"
                 }
             )}`
         })
@@ -54,7 +55,8 @@ function createProduct(){
                     photo: \"${document.getElementsByName('photo')[0].value}\",
                     file: \"${document.getElementsByName('file')[0].value}\",
                     price: ${parseFloat(document.getElementsByName('price')[0].value)},
-                    subscriptiontype: \"${document.getElementsByName('subscriptiontype')[0].value}\"
+                    subscriptiontype: \"${document.getElementsByName('subscriptiontype')[0].value}\",
+                    company: \"${document.getElementsByName('company')[0].value}\",
                 }
             )}`
         })
@@ -80,4 +82,5 @@ function displayProduct(productid) {
     document.getElementsByName('product-file')[0].value = tdArray[4].innerText
     document.getElementsByName('product-price')[0].value = tdArray[5].innerText
     document.getElementsByName('product-subscriptiontype')[0].value = tdArray[6].innerText
+    document.getElementsByName('product-company')[0].value = tdArray[7].innerText
 }

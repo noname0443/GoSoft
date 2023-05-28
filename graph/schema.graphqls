@@ -21,6 +21,7 @@ type Product {
     file: String!
     price: Float!
     subscriptiontype: String!
+    company: String!
 }
 
 type Purchase {
@@ -59,6 +60,7 @@ input NewProduct {
     file: String!
     price: Float!
     subscriptiontype: String!
+    company: String!
 }
 
 type Query {
@@ -79,6 +81,7 @@ type Query {
     ProfileUpdate(email: String, name: String, surname: String, gender: String, password: String): User!
 
     History: [Purchase!]
+    isBought(email: String!, password: String!, productid: Int!): Boolean!
 
     CommentAdd(content: String!, productid: Int!): Boolean!
     CommentRemove(commentid: Int!): Boolean!

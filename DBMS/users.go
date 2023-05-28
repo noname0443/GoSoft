@@ -103,6 +103,23 @@ func LoginCustomer(email string, password string) (string, error) {
 	return token, nil
 }
 
+func CheckUsersProduct(email string, password string, productid int) (bool, error) {
+	checkConnection()
+	rows, err := PostgreSQL.Query(`
+SELECT userid, datetime, productid, price, orderid, paid, count, subscriptiontype
+	FROM public.purchase
+	WHERE userid = (SELECT userid FROM users
+					WHERE email = $1 AND password = $2)
+					AND productid = $3;`, email, SHA1(password), productid)
+	if err != nil {
+		return false, nil
+	}
+	if !rows.Next() {
+		return false, nil
+	}
+	return true, nil
+}
+
 func GetProfile(token string) (*model.User, error) {
 	checkConnection()
 	rows, err := PostgreSQL.Query(`SELECT userid, email, name, surname, gender, registrationdate, role FROM users WHERE token = $1`, token)

@@ -9,7 +9,7 @@ import (
 func SearchProducts(name string, preparedCategory string, lowerPrice float64, highestPrice float64) ([]*model.Product, error) {
 	checkConnection()
 	rows, err := PostgreSQL.Query(`
-SELECT store.productid, name, description, photo, file, price, subscriptiontype FROM public.store
+SELECT store.productid, name, description, photo, file, price, subscriptiontype, company FROM public.store
 WHERE (LENGTH($4) = 0 OR productid in
 	   (SELECT productid FROM categories WHERE category = $4)) AND
 	   name LIKE $1 AND price >= $2 AND price <= $3;
@@ -21,7 +21,7 @@ WHERE (LENGTH($4) = 0 OR productid in
 	var products []*model.Product
 	for rows.Next() {
 		p := new(model.Product)
-		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Photo, &p.File, &p.Price, &p.Subscriptiontype)
+		err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Photo, &p.File, &p.Price, &p.Subscriptiontype, &p.Company)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +40,7 @@ func GetProduct(id int) (*model.Product, error) {
 		return nil, errors.New("Product not found")
 	}
 	p := new(model.Product)
-	err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.Photo, &p.File, &p.Price, &p.Subscriptiontype)
+	err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.Photo, &p.File, &p.Price, &p.Subscriptiontype, &p.Company)
 	if err != nil {
 		return nil, err
 	}
