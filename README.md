@@ -59,97 +59,106 @@ In terms of user interaction with components site uses the built-in mechanisms o
 ### Guest
 This role describes the capabilities of a user who is not
 registered and can perform the simplest actions:
-• View assortment
-• View comments
-• Registration/authorization
+- View assortment
+- View comments
+- Registration/authorization
+
 ![image](https://github.com/noname0443/GoSoft/blob/master/git/Guest%20Business%20Process%20Diagram.jpg)
 
 ### Customer
 This role describes the capabilities of the user who
 registered. He can perform the same actions as the guest, but his
-wider possibilities:
-• View assortment
-• View comments
-• Profile view
-• Add a comment
-• Add item to cart
-• View Cart
-• Remove item from cart
-• Buy items from the cart
-• View purchased items
-• Download purchased products
+wider possibilities
+- View assortment
+- View comments
+- Profile view
+- Add a comment
+- Add item to cart
+- View Cart
+- Remove item from cart
+- Buy items from the cart
+- View purchased items
+- Download purchased products
+
 ![image](https://github.com/noname0443/GoSoft/blob/master/git/Customer%20Business%20Process%20Diagram.jpg)
 
 ### Administrator
 This role describes the capabilities of an administrator. The role is required for
 filling the store with new products. Its features include
 the possibilities of previous roles, but they are added:
-• Adding a product to the store
-• Removing a product
-• Product information update
+- Adding a product to the store
+- Removing a product
+- Product information update
+
 ![image](https://github.com/noname0443/GoSoft/blob/master/git/Administrator%20Business%20Process%20Diagram.jpg)
 
 ## Database
 The basis for storing information is a PostgreSQL relational database.
+
 ![image](https://github.com/noname0443/GoSoft/blob/master/git/Database%20Entity%20Relationship%20Diagram.jpg)
 
 Users:
-• UserID – serial number of the registered user
-• Email - unique email address
-• Name – username
-• Surname – user's last name
-• Password - password in SHA1 hashed form
-• Gender - user's gender
-• Token – session token that is used for authorized
+- UserID – serial number of the registered user
+- Email - unique email address
+- Name – username
+- Surname – user's last name
+- Password - password in SHA1 hashed form
+- Gender - user's gender
+- Token – session token that is used for authorized
 action
-• TokenDate – time of token creation, after 72 hours it will automatically
+- TokenDate – time of token creation, after 72 hours it will automatically
 becomes unusable and the user must
 re-enter your details.
-• RegistrationDate - registration date.
-• Role - user role, can be "customer" or "admin".
+- RegistrationDate - registration date.
+- Role - user role, can be "customer" or "admin".
+
 Store:
-• ProductID - serial number of the product
-• Name - product name
-• Desciption – product description (May contain Russian letters, but
+- ProductID - serial number of the product
+- Name - product name
+- Desciption – product description (May contain Russian letters, but
 cannot contain line breaks)
-• Photo - path to the photo on the server (should be square NxN)
-• File – path to the file on the server, access to which is opened
+- Photo - path to the photo on the server (should be square NxN)
+- File – path to the file on the server, access to which is opened
 automatically upon purchase of the product and is valid until
 the subscription will not expire. It is required, as well as a photo, to upload to the server before
 product creation.
-• Price - the price in USD that the buyer must pay for the unit.
+- Price - the price in USD that the buyer must pay for the unit.
 SubscriptionType. In other words, if the user subscribes to
 month (SubscriptionType = month), then the price is multiplied by the quantity
 months.
-• SubscriptionType - subscription type: month, year.
-• Company - the name of the manufacturing company.
+- SubscriptionType - subscription type: month, year.
+- Company - the name of the manufacturing company.
+
 Cart:
-• UserID – serial number of the user-owner of the cart
-• ProductID - serial number of the ordered product
-• Count – quantity of the ordered product. Cannot be <= 0 otherwise
+- UserID – serial number of the user-owner of the cart
+- ProductID - serial number of the ordered product
+- Count – quantity of the ordered product. Cannot be <= 0 otherwise
 this order is automatically deleted.
+
 Categories:
-• ProductID - serial number of the product
-• Category - the name of the category to which the product belongs.
+- ProductID - serial number of the product
+- Category - the name of the category to which the product belongs.
+
 Purchase:
-• UserID – serial number of the user who bought/ordered
+- UserID – serial number of the user who bought/ordered
 product.
-• DateTime – order/purchase time.
-• ProductID - the serial number of the purchased product.
-• Price - price per unit of the purchased product.
-• OrderID - order number, generated by the paypal service that responds
+- DateTime – order/purchase time.
+- ProductID - the serial number of the purchased product.
+- Price - price per unit of the purchased product.
+- OrderID - order number, generated by the paypal service that responds
 for creating and paying orders.
-• Paid - order payment indicator
-• Count - the number of SubscriptionType units during which
+- Paid - order payment indicator
+- Count - the number of SubscriptionType units during which
 work subscription.
-• SubscriptionType - subscription type: month, year.
+- SubscriptionType - subscription type: month, year.
+
 Comment:
-• CommentID – serial number of the comment
-• Date - time when the comment was sent
-• UserID – serial number of the user who sent the comment
-• ProductID – serial number of the product to which the
+- CommentID – serial number of the comment
+- Date - time when the comment was sent
+- UserID – serial number of the user who sent the comment
+- ProductID – serial number of the product to which the
 a comment
-• Content - the content of the comment
+- Content - the content of the comment
 Trigger on the scheme is engaged in cleaning the database from records in Cart,
 the quantity value of which is less than or equal to zero.
 
