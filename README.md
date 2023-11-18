@@ -5,8 +5,8 @@
 ```
 sudo apt-get install postgresql
 sudo apt-get install go
-mkdir GolangChat
-cd GolangChat
+mkdir GoSoft
+cd GoSoft
 git clone https://github.com/noname0443/GoSoft.git
 psql -U myuser -f FirstRun.sql
 go build .
